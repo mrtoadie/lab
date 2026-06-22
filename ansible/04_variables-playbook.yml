@@ -1,0 +1,9 @@
+---
+- name: Working with variables
+  hosts: node1
+  vars:
+    fav_color: yellow
+  tasks:
+    - name: Show me fav_color value
+      debug:
+        msg: My favorite color is {{ fav_color }}.

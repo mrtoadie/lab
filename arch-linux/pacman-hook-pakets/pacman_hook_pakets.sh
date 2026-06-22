@@ -10,11 +10,15 @@
 
 LOGDATE=$(date +%b.%d.%Y)
 LOGTIME=$(date +%H:%M)
-LOGPATH=/home/YOURUSER/Logs/
+LOGPATH=/home/toadie/Dokumente/Obsidian/Linux/Logs/
 LOGFILE="Pacman_$HOSTNAME"_"$LOGDATE.md"
+LOGFILE_SUM=/home/toadie/Dokumente/Obsidian/Linux/Logs/Pacman_$HOSTNAME.md
 
 UPDATELOGDATE=$(date +%d.%m.%Y)
 UPDATELOG="Update_$HOSTNAME.md"
+
+#a='```table-of-contents'
+#t=$(cat /home/toadie/Dokumente/Obsidian/Linux/Logs/Pacman.md | grep $a)
 
 function getPacman 
 {
@@ -42,9 +46,14 @@ function getPacman
     echo '```' >> $LOGPATH$LOGFILE
 }
 
+function WriteLog
+{
+    echo '[['$LOGFILE']]' >> $LOGFILE_SUM
+}
+
 function CleanUp
 {
-    find $LOGPATH/Pacman_$HOSTNAME_*.md -mtime +5 -delete
+    find $LOGPATH/Pacman_toad_*.md -mtime +2 -delete
 }
 
 function UpdateLog
@@ -53,5 +62,21 @@ function UpdateLog
 }
 
 getPacman
+#WriteLog
 CleanUp
 UpdateLog
+
+# if [ $t = $a ];then
+#     getPacman
+# else
+#     echo '```table-of-contents' >> $LOGFILE
+#     echo 'title: # Index' >> $LOGFILE
+#     echo 'style: nestedOrderedList' >> $LOGFILE
+#     echo 'minLevel: 0' >> $LOGFILE
+#     echo 'maxLevel: 0' >> $LOGFILE
+#     echo 'includeLinks: true' >> $LOGFILE
+#     echo '```' >> $LOGFILE
+#
+#     getPacman
+# fi
+# EOF

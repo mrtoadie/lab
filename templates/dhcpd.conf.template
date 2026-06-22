@@ -1,0 +1,72 @@
+#
+# Sample configuration file for ISC dhcpd for Debian
+#
+# Attention: If /etc/ltsp/dhcpd.conf exists, that will be used as
+# configuration file instead of this file.
+#
+#
+
+# -- global options --
+default-lease-time                 160000;
+max-lease-time                     200000;
+use-host-decl-names                on;
+option dhcp-max-message-size       1024;
+ddns-update-style                  none;
+authorative;
+
+# Use this to send dhcp log messages to a different log file (you also
+# have to hack syslog.conf to complete the redirection).
+log-facility local7;
+
+
+subnet 192.168.0.0 netmask 255.255.255.0 {
+  range 192.168.0.10 192.168.0.20;
+  server-identifier 192.168.0.230;
+  option broadcast-address 192.168.0.255;
+  option routers 192.168.0.1;
+  option domain-name-servers 80.69.100.198, 80.69.100.12;
+#option domain-name "hsan.hh.schule.de";
+}
+
+host toadlap {
+	hardware ethernet 00:1D:09:36:54:72;
+	# filename "toadlap";
+	#server-name "toadlap.polygon";
+	fixed-address 192.168.0.30;
+	}
+	
+host client01 {
+	option host-name "hehe";
+	hardware ethernet 08:00:27:54:92:5B;
+	# server-name "toadlap.polygon";
+	fixed-address 192.168.0.40;
+	}
+
+# You can declare a class of clients and then do address allocation
+# based on that.   The example below shows a case where all clients
+# in a certain class get addresses on the 10.17.224/24 subnet, and all
+# other clients get addresses on the 10.0.29/24 subnet.
+
+#class "foo" {
+#  match if substring (option vendor-class-identifier, 0, 4) = "SUNW";
+#}
+
+#shared-network 224-29 {
+#  subnet 10.17.224.0 netmask 255.255.255.0 {
+#    option routers rtr-224.example.org;
+#  }
+#  subnet 10.0.29.0 netmask 255.255.255.0 {
+#    option routers rtr-29.example.org;
+#  }
+#  pool {
+#    allow members of "foo";
+#    range 10.17.224.10 10.17.224.250;
+#  }
+#  pool {
+#    deny members of "foo";
+#    range 10.0.29.10 10.0.29.230;
+#  }
+#}
+zone polygon.net. {
+	primary 192.168.0.230;
+	}

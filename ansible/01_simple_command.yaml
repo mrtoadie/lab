@@ -1,0 +1,6 @@
+---
+- name: Execute a simple command
+  hosts: localhost
+  tasks:
+    - name: Run 'ls' command
+      command: ls -l

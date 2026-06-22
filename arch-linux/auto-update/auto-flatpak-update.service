@@ -1,0 +1,6 @@
+[Unit]
+Description=Automatic Flatpak Updates
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/auto-flatpak-update.sh

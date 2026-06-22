@@ -1,0 +1,143 @@
+###############################################################################
+## Monit control file
+###############################################################################
+
+###############################################################################
+## Global section
+###############################################################################
+
+## Start Monit in the background (run as a daemon):
+set daemon  120           # check services at 2-minute intervals
+#     with start delay 240  # optional: delay the first check by 4-minutes (by 
+#                           # default Monit check immediately after Monit start)
+
+## Logging
+set logfile syslog facility log_daemon                       
+
+## Mail-Alert
+set alert <mail-adress>
+
+set mailserver smtp.gmail.com port 587
+	username "<mail-adress>" password ""
+	using tlsv1
+	with timeout 30 seconds
+
+# Monit Eventqueue
+set eventqueue
+	basedir /var/monit  # set the base directory where events will be stored
+#     slots 100           # optionally limit the queue size
+
+## Monit by default uses the following alert mail format:
+##
+## --8<--
+## From: monit@$HOST                         # sender
+## Subject: monit alert --  $EVENT $SERVICE  # subject
+##
+## $EVENT Service $SERVICE                   #
+##                                           #
+## 	Date:        $DATE                   #
+## 	Action:      $ACTION                 #
+## 	Host:        $HOST                   # body
+## 	Description: $DESCRIPTION            #
+##                                           #
+## Your faithful employee,                   #
+## Monit                                     #
+## --8<--
+##
+## You can override this message format or parts of it, such as subject
+## or sender using the MAIL-FORMAT statement. Macros such as $DATE, etc.
+## are expanded at runtime. For example, to override the sender, use:
+#
+# set mail-format { from: monit@foo.bar }
+
+
+## Monit Access
+set httpd port 2812 and
+	allow 192.168.0.0/255.255.255.0
+	allow localhost        # allow localhost to connect to the server and
+	allow monit:monit      # require user 'admin' with password 'monit'
+#     use address localhost  # only accept connection from localhost	 
+#     allow @monit           # allow users of group 'monit' to connect (rw)
+#     allow @users readonly  # allow users of group 'users' to connect readonly
+
+###############################################################################
+## Services
+###############################################################################
+
+## Monit Server
+check system ubuntuvm
+	if loadavg (1min) > 4 then alert
+	if loadavg (5min) > 2 then alert
+	if memory usage > 75% then alert
+	if swap usage > 25% then alert
+	if cpu usage (user) > 70% then alert
+	if cpu usage (system) > 30% then alert
+	if cpu usage (wait) > 20% then alert
+	
+## Apache2
+check process apache2 with pidfile /var/run/apache2.pid
+	group www
+    start program = "/etc/init.d/apache2 start"
+    stop program  = "/etc/init.d/apache2 stop"
+    if children > 250 then restart
+    if loadavg(5min) greater than 10 for 8 cycles then stop
+    if 3 restarts within 5 cycles then timeout
+
+## SSH
+check process sshd with pidfile /var/run/sshd.pid
+	start program "/etc/init.d/ssh start"
+	stop program "/etc/init.d/ssh stop"
+	if failed port 22 protocol ssh then restart
+	if 5 restarts within 5 cycles then timeout
+
+## NTP Server
+check process ntpd with pidfile /var/run/ntpd.pid
+	start program = "/etc/init.d/ntp start"
+	stop  program = "/etc/init.d/ntp stop"
+	if failed host 127.0.0.1 port 123 type udp then alert
+	if 5 restarts within 5 cycles then timeout		
+   
+## Check /
+check filesystem root with path /dev/sda1
+#    start program  = "/bin/mount /home/toadie"
+#    stop program  = "/bin/umount /homr/toadie"
+	if failed permission 660 then unmonitor
+    if failed uid root then unmonitor
+    if failed gid disk then unmonitor
+    if space usage > 50% for 5 times within 15 cycles then alert
+    if space usage > 99% then stop
+#    if inode usage > 30000 then alert
+#    if inode usage > 99% then stop
+    group server
+
+###############################################################################
+## Hosts Alive
+###############################################################################
+	
+## ToadStation
+check host ToadStation with address 192.168.0.220
+    if failed icmp type echo count 3 with timeout 3 seconds then alert
+#    if failed port 3306 protocol mysql with timeout 15 seconds then alert
+#    if failed url http://user:password@192.168.1.1:8080/?querystring
+#       and content == 'action="j_security_check"'
+#       then alert
+
+## ToadLap
+check host ToadLap with address 192.168.0.224
+    if failed icmp type echo count 3 with timeout 3 seconds then alert
+    if failed port 80 protocol http with timeout 15 seconds then alert	
+	if failed port 22 protocol ssh with timeout 15 seconds then alert
+
+## Router	
+check host Router with address 192.168.0.1
+    if failed icmp type echo count 3 with timeout 3 seconds then alert    
+		
+###############################################################################
+## Includes
+###############################################################################
+##
+## It is possible to include additional configuration parts from other files or
+## directories.
+#
+#include /etc/monit/conf.d/*
+

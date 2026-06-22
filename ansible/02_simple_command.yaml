@@ -1,0 +1,10 @@
+---
+- name: first play
+  hosts: all
+  tasks:
+    - name: create a new file
+      file:
+        path: /tmp/foo.conf
+        mode: 0664
+        owner: toadie
+        state: touch

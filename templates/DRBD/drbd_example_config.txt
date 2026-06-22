@@ -1,0 +1,25 @@
+# You can find an example in  /usr/share/doc/drbd.../drbd.conf.example
+
+#include "drbd.d/global_common.conf";
+#include "drbd.d/*.res";
+
+global {
+  usage-count yes; # wird verwendet, um Use-Statistiken an DRBD zu senden, kann mit no deaktiviet werden
+}
+common {
+  protocol C; # das verwendete Sync-Protokol ist C, das auch eine Voll-Syncronisierung von beiden Nodes erlaubt
+}
+resource r0 { # die zu generierende Recource r0 kann ein beliebiger Bezeichner OHNE Lehrzeichen sein
+  syncer { 
+    rate 10M; # sycronisieren mit 10MB/s
+  }
+  device /dev/drbd1;  # entspricht der zu verwendenden Block-Device Minor-Number
+  disk /dev/sdb1;     # als Beispiel die erste Partition auf der zweiten SCSI-Festplatte
+  meta-disk internal; # wir verwenden lokal erstellte Meta-Daten
+  on linuxmintVM1 { 
+    address 192.168.0.10:7789; 
+  }
+  on linuxmintVM { # node 2
+    address 192.168.0.20:7789;
+  }
+}

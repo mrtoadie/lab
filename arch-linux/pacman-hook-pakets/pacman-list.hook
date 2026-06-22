@@ -9,4 +9,5 @@ Target = *
 [Action]
 Description = Create a backup list of all installed packages
 When = PreTransaction
-Exec = /bin/sh -c '/home/YOURUSER/pacman_hook_pakets.sh'
+#Exec = /bin/sh -c 'pacman -Qqen  > "/run/media/toadie/data/Backups/BackupConfig/$(date +%Y-%m-%d_%H:%M)_Pakete.log"; pacman -Qqem > "/run/media/toadie/data/Backups/BackupConfig/$(date +%Y-%m-%d_%H:%M)_FremdPakete.txt" 2> /dev/null; exit'
+Exec = /bin/sh -c '/run/media/toadie/data/Dev/Bash/Backup-Scripts/pacman_hook_pakets.sh'
