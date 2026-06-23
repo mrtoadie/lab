@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    label: "1"
+    label2: "02"
+  name: bla1
+spec:
+  containers:
+  - image: nginx
+    name: nginxmini

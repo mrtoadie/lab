@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: archdemo
+  labels:
+    app: archdemo
+spec:
+  containers:
+    - name: arch
+      image: archlinux:latest          # Basis‑Image
+      command: ["sleep"]               # Pod soll am Leben bleiben
+      args: ["infinity"]               # – statt sofort zu beenden
+      resources:
+        limits:
+          cpu: "250m"
+          memory: "128Mi"

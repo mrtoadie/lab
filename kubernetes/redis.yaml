@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-pod
+  labels:
+    app: cache
+    env: dev
+spec:
+  containers:
+    - name: redis-container
+      image: redis
