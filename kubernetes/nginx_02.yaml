@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginxdemo
+    web: minimal
+  name: nginxdemo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginxdemo
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: nginxdemo
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}

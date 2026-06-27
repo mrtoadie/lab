@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-deploy-bobby
+spec:
+  replicas: 2               # Zwei Pods zeigen Load‑Balancing
+  selector:
+    matchLabels:
+      app: hello-bobby
+  template:
+    metadata:
+      labels:
+        app: hello-bobby
+    spec:
+      containers:
+        - name: hello-bobby
+          image: hello-minikube:latest   # Unser lokales Image
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "128Mi"

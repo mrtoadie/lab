@@ -1,0 +1,14 @@
+# pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce          # Nur ein Node kann schreiben (typisch)
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard # optional – default ist bereits „standard“
+  
+  

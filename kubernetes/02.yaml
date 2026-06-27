@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: arch
+  name: arch
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: arch
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: arch
+    spec:
+      containers:
+      - image: archlinux
+        name: archlinux
+        resources: {}
+status: {}

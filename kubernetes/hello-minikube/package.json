@@ -1,0 +1,11 @@
+{
+  "name": "hello-minikube",
+  "version": "1.0.0",
+  "description": "Ein Mini‑Node‑Server für Minikube‑Demo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }

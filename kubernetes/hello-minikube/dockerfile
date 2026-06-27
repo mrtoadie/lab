@@ -1,0 +1,20 @@
+# 1️⃣ Basis‑Image
+FROM node:20-alpine
+
+# 2️⃣ Arbeitsverzeichnis im Container
+WORKDIR /app
+
+# 3️⃣ Nur package‑Dateien kopieren (für effizientes Caching)
+COPY package*.json ./
+
+# 4️⃣ Abhängigkeiten installieren
+RUN npm ci --only=production
+
+# 5️⃣ Rest des Quellcodes hinzufügen
+COPY . .
+
+# 6️⃣ Port, den der Container nutzt
+EXPOSE 8080
+
+# 7️⃣ Start‑Befehl
+CMD ["npm", "start"]

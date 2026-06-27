@@ -1,0 +1,18 @@
+# pod-with-pvc.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-with-pvc
+spec:
+  containers:
+    - name: nginx
+      image: nginx:stable-alpine
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html   # Pfad im Container
+  volumes:
+    - name: html
+      persistentVolumeClaim:
+        claimName: demo-pvc
