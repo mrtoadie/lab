@@ -5,20 +5,17 @@ metadata:
     app: test
   name: test
 spec:
-  replicas: 3
+  replicas: 10
   selector:
     matchLabels:
       app: test
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 1
+    type: Recreate
   template:
     metadata:
       labels:
         app: test
     spec:
       containers:
-      - image: httpd:alpine3.19
+      - image: httpd:alpine3.18
         name: httpd

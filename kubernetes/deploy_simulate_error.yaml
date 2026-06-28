@@ -5,7 +5,7 @@ metadata:
     app: test
   name: test
 spec:
-  replicas: 3
+  replicas: 10
   selector:
     matchLabels:
       app: test
@@ -20,5 +20,7 @@ spec:
         app: test
     spec:
       containers:
-      - image: httpd:alpine3.19
+      - image: httpd:alpine3.18
         name: httpd
+        command: ["/bin/bash", "-c"]
+        args: ["sleep 5; ecit 1"]
