@@ -1,0 +1,18 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mini-cronjob
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: db-backup
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - <backupCommand>
+          restartPolicy: OnFailure

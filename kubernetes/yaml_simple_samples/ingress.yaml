@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mini-ingress
+spec:
+  tls:
+  - hosts:
+    - example.com
+    - api.example.com
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: example-webseite
+          servicePort: 80
+  - host: api.example.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: example-api
+          servicePort: 8000

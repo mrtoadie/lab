@@ -1,0 +1,9 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mini-configmap
+data:
+  URL: "https://example.com"
+  LOGGING_LEVEL: "development"
+  CHECK_UPDATE: "yes"
