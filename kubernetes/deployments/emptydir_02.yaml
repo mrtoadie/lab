@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-storage02
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-storage02
+  template:
+    metadata:
+      labels:
+        app: nginx-storage02
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        volumeMounts:
+        - mountPath: /scratch
+          name: scratch-volume
+      volumes:
+      - name: scratch-volume
+        emptyDir:
+          sizeLimit: 500Mi
