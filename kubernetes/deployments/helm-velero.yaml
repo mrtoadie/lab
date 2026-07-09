@@ -1,0 +1,17 @@
+# helmfile.yaml — generated at helmforge.dev/stack
+repositories:
+  - name: helmforge
+    url: https://repo.helmforge.dev
+
+releases:
+  - name: generic
+    namespace: helmforge
+    chart: helmforge/generic
+    wait: true
+    timeout: 300
+
+  - name: velero
+    namespace: helmforge
+    chart: helmforge/velero
+    wait: true
+    timeout: 300
