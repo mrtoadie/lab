@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-local
+  labels:
+    app: ubuntu-local
+    environment: development
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu:latest
+    command: 
+    - sh 
+    - -c
+    - |
+      apt update && \ 
+      apt install mc -y
+    stdin: true
+    tty: true
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
+    volumeMounts:
+    - name: workspace
+      mountPath: /workspace
+  volumes:
+  - name: workspace
+    emptyDir: {}
