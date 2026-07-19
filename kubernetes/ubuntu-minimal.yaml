@@ -23,3 +23,7 @@ spec:
         command: ["sleep", "infinity"]
         stdin: true
         tty: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"

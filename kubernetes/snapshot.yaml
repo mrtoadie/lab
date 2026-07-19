@@ -1,0 +1,8 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: data-snapshot
+spec:
+  volumeSnapshotClassName: fast-snapshot
+  source:
+    persistentVolumeClaimName: pvc-b83dc6bf-573f-47f9-bb10-ccb6e9124980

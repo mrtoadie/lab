@@ -1,0 +1,204 @@
+{
+  "dashboard": {
+    "uid": "k8s-cluster-overview",
+    "title": "Kubernetes Cluster Overview",
+    "tags": ["kubernetes", "k8s", "monitoring"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "cluster",
+          "type": "query",
+          "datasource": "Prometheus",
+          "query": "label_values(kube_node_info, cluster)",
+          "refresh": 1
+        },
+        {
+          "name": "namespace",
+          "type": "query",
+          "datasource": "Prometheus",
+          "query": "label_values(kube_namespace_created{cluster=\"$cluster\"}, namespace)",
+          "refresh": 1,
+          "multi": true
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Cluster CPU Usage",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(container_cpu_usage_seconds_total{cluster=\"$cluster\", image!=\"\"}[5m])) by (instance) * 100",
+            "legendFormat": "{{instance}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "percentunit", "label": "CPU Usage"},
+          {"show": false}
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Cluster Memory Usage",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(container_memory_usage_bytes{cluster=\"$cluster\", image!=\"\"}) / sum(kube_node_status_allocatable{resource=\"memory\"}) * 100",
+            "legendFormat": "Memory Usage %"
+          }
+        ],
+        "yaxes": [
+          {"format": "percentunit", "label": "Memory Usage"},
+          {"show": false}
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Pod Status Distribution",
+        "type": "piechart",
+        "gridPos": {"x": 0, "y": 8, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(kube_pod_status_phase{cluster=\"$cluster\", namespace=~\"$namespace\"}) by (phase)",
+            "legendFormat": "{{phase}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Node Resource Allocation",
+        "type": "bargauge",
+        "gridPos": {"x": 8, "y": 8, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", cluster=\"$cluster\"}) by (node)",
+            "legendFormat": "{{node}} CPU Requests"
+          },
+          {
+            "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", cluster=\"$cluster\"}) by (node)",
+            "legendFormat": "{{node}} Memory Limits"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Persistent Volume Usage",
+        "type": "gauge",
+        "gridPos": {"x": 16, "y": 8, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(kube_persistentvolume_capacity_bytes{cluster=\"$cluster\"})",
+            "legendFormat": "Total Capacity"
+          },
+          {
+            "expr": "sum(kube_persistentvolume_claim_ref{cluster=\"$cluster\"})",
+            "legendFormat": "In Use"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Network Traffic by Namespace",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(container_network_receive_bytes_total{cluster=\"$cluster\", namespace=~\"$namespace\"}[5m])) by (namespace)",
+            "legendFormat": "{{namespace}} RX"
+          },
+          {
+            "expr": "sum(rate(container_network_transmit_bytes_total{cluster=\"$cluster\", namespace=~\"$namespace\"}[5m])) by (namespace)",
+            "legendFormat": "{{namespace}} TX"
+          }
+        ],
+        "yaxes": [
+          {"format": "Bps", "label": "Network Bytes/sec"},
+          {"show": false}
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Pod Restart Count",
+        "type": "table",
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(kube_pod_container_status_restarts_total{cluster=\"$cluster\", namespace=~\"$namespace\"}) by (pod, namespace)",
+            "instant": true,
+            "format": "table",
+            "legendFormat": ""
+          }
+        ],
+        "transformations": [
+          {
+            "id": "labelsToFields",
+            "options": {}
+          },
+          {
+            "id": "sortBy",
+            "options": {
+              "sortBy": [{"displayName": "Value", "desc": true}]
+            }
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Kubelet HTTP Request Rate",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(kubelet_http_requests_total{cluster=\"$cluster\"}[5m])) by (handler, method)",
+            "legendFormat": "{{method}} {{handler}}"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Disk Pressure Nodes",
+        "type": "stat",
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "kube_node_status_condition{condition=\"DiskPressure\", status=\"true\", cluster=\"$cluster\"}",
+            "legendFormat": "{{node}} - Disk Pressure"
+          }
+        ],
+        "color": {
+          "mode": "thresholds",
+          "thresholds": [
+            {"value": 0, "color": "green"},
+            {"value": 1, "color": "red"}
+          ]
+        }
+      },
+      {
+        "id": 10,
+        "title": "Deployment Replicas",
+        "type": "state-timeline",
+        "gridPos": {"x": 0, "y": 32, "w": 24, "h": 6},
+        "targets": [
+          {
+            "expr": "kube_deployment_status_replicas_available{cluster=\"$cluster\", namespace=~\"$namespace\"}",
+            "legendFormat": "{{deployment}}",
+            "refId": "A"
+          }
+        ]
+      }
+    ]
+  }
+}
