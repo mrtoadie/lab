@@ -1,0 +1,29 @@
+# kubernetes
+alias k="kubectl"
+alias kgp="kubectl get pods"
+alias kgn="kubectl get namespaces"
+alias kgd="kubectl get deployments.apps"
+
+# vim
+alias vim="nvim"
+
+# folders
+alias folders="sudo du -h /* --exclude={'proc','run'}| sort -hr | less"
+alias cd..='cd ..'
+
+# files
+alias ls="lsd -lah --header"
+alias l.='lsd -lah | egrep "^\."'
+alias lt='lsd --tree -al'
+alias lsize="du -hsx * | sort -rh | head -10"
+
+# tools
+#alias duf="duf -only local,network"
+alias duf="duf -only local,network -hide-mp /boot/efi,/var/cache,/var/log,/var/tmp,/srv"
+alias cls="clear"
+alias free="free --mega -ht -w"
+alias pacseek="pacseek -u"
+alias ps_mem="ps -eo pid,ppid,cmd,%mem --sort=-%mem | head -n 10"
+alias ps_cpu="ps -eo pid,ppid,cmd,%cpu --sort=-%cpu | head -n 10"
+alias pwgen="pwgen -ysc 20 10 | column"
+alias ff="fastfetch"
