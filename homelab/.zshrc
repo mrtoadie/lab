@@ -76,6 +76,10 @@ source $ZSH/oh-my-zsh.sh
 
 [[ -f ~/.zsh-aliases ]] && . ~/.zsh-aliases
 
+# fastfetch @ SSH login
+if [ -n "$SSH_CONNECTION" ] && [ -t 1 ]; then
+    fastfetch
+fi
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
