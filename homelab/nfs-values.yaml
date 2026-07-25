@@ -1,0 +1,15 @@
+nfs:
+  server: 192.168.178.210
+  path: /media/toadie/clusterdata
+
+storageClass:
+  name: nfs-dynamic
+  isDefaultClass: true
+  reclaimPolicy: Retain
+  mountOptions:
+    - hard
+    - timeo=600
+    - retrans=2
+    - nconnect=4
+    - rsize=1048576
+    - wsize=1048576
