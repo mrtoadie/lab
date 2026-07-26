@@ -1,0 +1,32 @@
+---
+- name: Update Raspberry Pi Cluster
+  hosts: pi_cluster
+  become: yes
+  serial: 1                       # EINE Node nach der anderen!
+  gather_facts: yes
+  
+  tasks:
+    - name: Update package cache
+      ansible.builtin.package:
+        update_cache: yes
+        
+    - name: Upgrade all packages
+      ansible.builtin.package:
+        name: "*"
+        state: latest
+        
+    - name: Check if reboot is needed
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+      ignore_errors: yes
+      
+    - name: Reboot if necessary
+      ansible.builtin.reboot:
+        reboot_timeout: 300
+      when: ansible_distribution == "Debian" or ansible_os_family == "RedHat"
+      ignore_errors: yes
+      
+    - name: Wait for node to come back
+      ansible.builtin.wait_for_connection:
+        timeout: 300
