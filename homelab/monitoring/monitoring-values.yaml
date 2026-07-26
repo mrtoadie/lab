@@ -1,0 +1,20 @@
+# Für Prometheus (Retention und Speicher)
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: nfs-dynamic  # z.B. nfs-dynamic oder local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+
+# Für Grafana (Dashboards und SQLite DB)
+grafana:
+  persistence:
+    enabled: true
+    storageClassName: nfs-dynamic
+    accessModes: ["ReadWriteOnce"]
+    size: 2Gi
