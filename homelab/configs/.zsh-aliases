@@ -10,6 +10,7 @@ alias vim="nvim"
 # folders
 alias folders="sudo du -h /* --exclude={'proc','run'}| sort -hr | less"
 alias cd..='cd ..'
+alias data="cd /media/toadie/clusterdata"
 
 # files
 alias ls="lsd -lah --header"
