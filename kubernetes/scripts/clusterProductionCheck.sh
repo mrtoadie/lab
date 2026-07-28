@@ -108,7 +108,76 @@ function ControlPlaneHealth {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # CERTIFICATE EXPIRATION (Critical!)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CERTIFICATE EXPIRATION (Critical!)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function CertificateExpiration {
+  print_header_second "CERTIFICATES & TLS"
+
+  # 1. k3s API Server Certificate direkt vom Dateisystem lesen
+  local k3s_cert_path="/etc/rancher/k3s/server/tls/server.crt"
+  if [ -f "$k3s_cert_path" ] && [ -r "$k3s_cert_path" ]; then
+    expiry_date=$(openssl x509 -in "$k3s_cert_path" -noout -enddate 2>/dev/null | cut -d= -f2)
+    if [ -n "$expiry_date" ]; then
+      echo -e "${CYAN}API Server (k3s):${RESET} Expires $expiry_date"
+    fi
+  else
+    # Fallback für Standard k8s (kubeadm)
+    api_cert=$(kubectl get secret -n kube-system kube-api-serving-cert -o jsonpath='{.data.tls\.crt}' 2>/dev/null | base64 -d 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null || echo "")
+    if [ -n "$api_cert" ]; then
+      expiry_date=$(echo "$api_cert" | cut -d= -f2)
+      echo -e "${CYAN}API Server:${RESET} Expires $expiry_date"
+    else
+      info "API Server Certificate cannot be verified (kubeadm/cert-manager or no root access)"
+    fi
+  fi
+
+  # 2. Ingress TLS Certificates zählen
+  tls_certs=$(kubectl get secrets --all-namespaces -o jsonpath='{range .items[*]}{.metadata.namespace}{"|"}{.metadata.name}{"|"}{.type}{"\n"}{end}' 2>/dev/null | grep tls | wc -l)
+  info "TLS Secrets found: $tls_certs"
+
+  # 3. Secrets prüfen (Ablauf < 30 Tage oder EXPIRED)
+  warning_certs=""
+  expired_certs=""
+  
+  # Safely extract namespace, name, and cert data using jq
+  for secret_info in $(kubectl get secrets --all-namespaces -o json 2>/dev/null | jq -r '.items[] | select(.type=="kubernetes.io/tls") | "\(.metadata.namespace)|\(.metadata.name)|\(.data["tls.crt"] // "")"' 2>/dev/null); do
+    ns=$(echo "$secret_info" | cut -d'|' -f1)
+    name=$(echo "$secret_info" | cut -d'|' -f2)
+    cert_data=$(echo "$secret_info" | cut -d'|' -f3-)
+    
+    if [ -n "$cert_data" ] && [ "$cert_data" != "null" ]; then
+      end_date=$(echo "$cert_data" | base64 -d 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
+      
+      if [ -n "$end_date" ]; then
+        # FIXED: Korrekte Datumsumwandlung in Epoch-Sekunden
+        expiry_epoch=$(date -d "$end_date" +%s 2>/dev/null)
+        current_epoch=$(date +%s)
+        
+        if [ -n "$expiry_epoch" ]; then
+          days_until=$(( (expiry_epoch - current_epoch) / 86400 ))
+          
+          if [ "$days_until" -lt 30 ] && [ "$days_until" -gt 0 ]; then
+            warning_certs="${warning_certs}${ns}/${name} ($days_until days)\n"
+          elif [ "$days_until" -le 0 ]; then
+            expired_certs="${expired_certs}${ns}/${name} EXPIRED!\n"
+          fi
+        fi
+      fi
+    fi
+  done
+
+  if [ -n "$expired_certs" ]; then
+    error "EXPIRED certificates found:"
+    echo -e "$expired_certs" | sed 's/^/  /'
+  fi
+
+  if [ -n "$warning_certs" ]; then
+    warn "Certificates expiring soon (< 30 days):"
+    echo -e "$warning_certs" | sed 's/^/  /'
+  fi
+}
+function CertificateExpirationOld {
   print_header_second "CERTIFICATES & TLS"
 
   # API Server Certificate
