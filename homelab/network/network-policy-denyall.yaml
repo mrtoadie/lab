@@ -1,0 +1,11 @@
+# Namespace-wide "No Traffic Allowed Unless Explicitly Permitted"
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: testing
+spec:
+  podSelector: {}  # Alle Pods im Namespace
+  policyTypes:
+  - Ingress
+  - Egress
