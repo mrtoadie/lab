@@ -25,8 +25,20 @@ shutdown_hosts() {
   done
 }
 
+restart_hosts() {
+  for host in "${HOSTS[@]}"; do
+    if ping -c 1 -W 2 "$host" &>/dev/null; then
+      printf "✅ %s is up\n" "$host"
+      ssh -o ConnectTimeout=5 "$USER@$ip" "sudo reboot" 2>/dev/null
+    else
+      printf "❌ %s is down\n" "$host"
+    fi
+  done
+}
+
 case "$1" in
   ping)     ping_hosts ;;
   shutdown) shutdown_hosts ;;
+  restart) restart_hosts ;;
   *)        echo "Usage: $0 {ping|shutdown}"; exit 1 ;;
 esac
