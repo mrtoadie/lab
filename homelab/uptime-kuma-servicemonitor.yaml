@@ -1,0 +1,19 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: uptime-kuma-monitor
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: uptime-kuma
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  endpoints:
+    - port: 3001        # Port deines Uptime Kuma Services
+      path: /metrics     # Endpoint in der Uptime Kuma Web-UI aktivieren!
+      interval: 30s
