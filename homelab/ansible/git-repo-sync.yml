@@ -1,0 +1,50 @@
+---
+- name: Git Repository auf allen Nodes synchronisieren
+  hosts: k3s_nodes
+  become: false
+  vars:
+    repo_url: "https://github.com/mrtoadie/lab.git"
+    repo_dest: "/home/toadie/Projects/lab"
+    repo_branch: "main"
+    git_user: "toadie"
+    
+  tasks:
+    # 1. Repository klonen (falls nicht vorhanden)
+    - name: Repository existieren prüfen
+      ansible.builtin.stat:
+        path: "{{ repo_dest }}"
+      register: repo_stat
+
+    - name: Repository clonen
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ repo_dest }}"
+        version: "{{ repo_branch }}"
+        accept_hostkey: yes
+      when: not repo_stat.stat.exists
+      register: clone_result
+
+    # 2. Repository pullen (falls bereits vorhanden)
+    - name: Repository pullen
+      ansible.builtin.command:
+        cmd: git pull origin {{ repo_branch }}
+        chdir: "{{ repo_dest }}"
+      when: repo_stat.stat.exists
+      register: pull_result
+      changed_when: "'Already up to date' not in pull_result.stdout"
+
+    # 3. Status anzeigen
+    - name: Pull-Ergebnis protokollieren
+      ansible.builtin.debug:
+        msg: |
+          Host: {{ inventory_hostname }}
+          Status: {{ 'Cloned' if clone_result.changed else 'Pulled' }}
+          Changes: {{ pull_result.stdout | default('None') }}
+
+    # 4. Optional: Nach Pull ausführen (z.B. Skript reload)
+    - name: Nach Pull: Service neu laden (optional)
+      ansible.builtin.command:
+        cmd: /opt/scripts/reload-services.sh
+        creates: /tmp/.last_reload
+      when: pull_result.changed
+      register: reload_result

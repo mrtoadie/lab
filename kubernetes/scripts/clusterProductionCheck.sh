@@ -108,9 +108,6 @@ function ControlPlaneHealth {
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # CERTIFICATE EXPIRATION (Critical!)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# CERTIFICATE EXPIRATION (Critical!)
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function CertificateExpiration {
   print_header_second "CERTIFICATES & TLS"
 
@@ -165,52 +162,6 @@ function CertificateExpiration {
         fi
       fi
     fi
-  done
-
-  if [ -n "$expired_certs" ]; then
-    error "EXPIRED certificates found:"
-    echo -e "$expired_certs" | sed 's/^/  /'
-  fi
-
-  if [ -n "$warning_certs" ]; then
-    warn "Certificates expiring soon (< 30 days):"
-    echo -e "$warning_certs" | sed 's/^/  /'
-  fi
-}
-function CertificateExpirationOld {
-  print_header_second "CERTIFICATES & TLS"
-
-  # API Server Certificate
-  api_cert=$(kubectl get secret -n kube-system kube-api-serving-cert -o jsonpath='{.data.tls\.crt}' 2>/dev/null | base64 -d 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null || echo "")
-  if [ -n "$api_cert" ]; then
-    expiry_date=$(echo "$api_cert" | cut -d= -f2)
-    echo -e "${CYAN}API Server:${RESET} Expires $expiry_date"
-  else
-    info "API Server Certificate cannot be verified (kubeadm/cert-manager)"
-  fi
-
-  # Ingress TLS Certificates
-  tls_certs=$(kubectl get secrets --all-namespaces -o jsonpath='{range .items[*]}{.metadata.namespace}{"|"}{.metadata.name}{"|"}{.type}{"\n"}{end}' 2>/dev/null | grep tls | wc -l)
-  info "TLS Secrets found: $tls_certs"
-
-  # Check for early expiry (< 30 days)
-  warning_certs=""
-  expired_certs=""
-  for ns in $(kubectl get namespaces -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null); do
-    for secret in $(kubectl get secrets -n "$ns" -o name 2>/dev/null); do
-      cert_data=$(kubectl get "$secret" -n "$ns" -o jsonpath='{.data.tls\.crt}' 2>/dev/null)
-      if [ -n "$cert_data" ]; then
-        end_date=$(echo "$cert_data" | base64 -d 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
-        if [ -n "$end_date" ]; then
-          days_until=$(( ($(date -d "$end_date +%Y-%m-%d +%s") - $(date +%s)) / 86400 ))
-          if [ "$days_until" -lt 30 ] && [ "$days_until" -gt 0 ]; then
-            warning_certs="${warning_certs}${ns}/${secret##*/} ($days_until days)\n"
-          elif [ "$days_until" -le 0 ]; then
-            expired_certs="${expired_certs}${ns}/${secret##*/} EXPIRED!\n"
-          fi
-        fi
-      fi
-    done
   done
 
   if [ -n "$expired_certs" ]; then
@@ -398,6 +349,50 @@ function PODAutoscaling {
     TARGET:.spec.targetCPUUtilizationPercentage \
     --no-headers 2>/dev/null | column -t
   fi
+}
+
+# Storage
+function StorageCheck {
+  print_header_second "STORAGE STATUS"
+
+  # 1. StorageClasses
+  sc_count=$(kubectl get storageclasses --no-headers 2>/dev/null | wc -l)
+  default_sc=$(kubectl get storageclass -o jsonpath='{.items[?(@.annotations.storageclass\.kubernetes\.io/is-default-class=="true")].metadata.name}' 2>/dev/null)
+  
+  info "StorageClasses: $sc_count"
+  [ -n "$default_sc" ] && success "Default SC: $default_sc" || warn "Keine Default StorageClass"
+
+  # 2. PersistentVolumes
+  pv_total=$(kubectl get pv --no-headers 2>/dev/null | wc -l)
+  pv_available=$(kubectl get pv --no-headers 2>/dev/null | grep Available | wc -l)
+  pv_bound=$(kubectl get pv --no-headers 2>/dev/null | grep Bound | wc -l)
+  pv_failed=$(kubectl get pv --no-headers 2>/dev/null | grep Failed | wc -l)
+
+  info "PVs: Total=$pv_total | Available=$pv_available | Bound=$pv_bound | Failed=$pv_failed"
+
+  if [ "$pv_failed" -gt 0 ]; then
+    warn "Failed PVs:"
+    kubectl get pv --no-headers 2>/dev/null | grep Failed | awk '{print "  ├─ "$1}'
+  fi
+
+  # 3. PersistentVolumeClaims
+  pvc_total=$(kubectl get pvc --all-namespaces --no-headers 2>/dev/null | wc -l)
+  pvc_pending=$(kubectl get pvc --all-namespaces --no-headers 2>/dev/null | grep Pending | wc -l)
+
+  info "PVCs: Total=$pvc_total | Pending=$pvc_pending"
+
+  if [ "$pvc_pending" -gt 0 ];
+then
+    warn "Pending PVCs:"
+    kubectl get pvc --all-namespaces --no-headers 2>/dev/null | grep Pending | awk '{print "  ├─ "$1"/"$2}'
+  fi
+
+  # 4. Node Disk Usage (nur wenn Zugriff auf Host)
+  info "Node Disk Usage:"
+  for node in $(kubectl get nodes -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
+    disk_usage=$(kubectl top node "$node" 2>/dev/null | tail -1 | awk '{print $2}')
+    [ -n "$disk_usage" ] && echo -e "  ├─ ${node}: ${disk_usage}" || info "  ├─ ${node}: metrics unavailable"
+  done
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -638,6 +633,7 @@ ClusterInfo
 HelmInfo
 ControlPlaneHealth
 CertificateExpiration
+StorageCheck
 BackupStatus
 ResourceQuotasLimits
 PODSecurity
