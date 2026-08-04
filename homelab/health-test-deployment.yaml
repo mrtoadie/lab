@@ -1,0 +1,178 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: health-server-script
+  namespace: default
+data:
+  health-server.py: |
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+    import json
+    import os
+    import signal
+    import sys
+
+    class HealthHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path.startswith('/health'):
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                response = {
+                    'status': 'healthy',
+                    'pod': os.environ.get('POD_NAME', 'unknown'),
+                    'node': os.environ.get('NODE_NAME', 'unknown'),
+                    'uptime_server': 'v1.0'
+                }
+                self.wfile.write(json.dumps(response).encode())
+            elif self.path.startswith('/ready'):
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(b'{"ready": true}')
+            elif self.path.startswith('/live'):
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(b'{"alive": true}')
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+        def log_message(self, format, *args):
+            pass  # Logs unterdrücken
+
+    if __name__ == '__main__':
+        # Graceful Shutdown
+        def signal_handler(sig, frame):
+            print('Shutting down gracefully...')
+            sys.exit(0)
+
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
+
+        server = HTTPServer(('0.0.0.0', 8080), HealthHandler)
+        print(f'Health server running on port 8080, PID {os.getpid()}')
+        server.serve_forever()
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-health-test
+  namespace: default
+  labels:
+    app: ubuntu-health-test
+    env: local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu-health-test
+  template:
+    metadata:
+      labels:
+        app: ubuntu-health-test
+        env: local
+    spec:
+      containers:
+      - name: health-server
+        image: ubuntu:24.04
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http-health
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        # Installation von Python3 beim Start
+        command:
+        - /bin/bash
+        - -c
+        - |
+          apt-get update && apt-get install -y --no-install-recommends python3 && \
+          rm -rf /var/lib/apt/lists/* && \
+          exec python3 /opt/health-server.py
+        # Script als Volume mounten
+        volumeMounts:
+        - name: script-volume
+          mountPath: /opt/health-server.py
+          subPath: health-server.py
+        # Health Probes für Uptime Kuma + K8s
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 15  # Zeit für apt-get installation
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: false
+      volumes:
+      - name: script-volume
+        configMap:
+          name: health-server-script
+          defaultMode: 0755
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-health-test-service
+  namespace: default
+  labels:
+    app: ubuntu-health-test
+spec:
+  type: ClusterIP
+  selector:
+    app: ubuntu-health-test
+  ports:
+  - name: http-health
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+
+---
+# Optional: Ingress falls du einen hast
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ubuntu-health-test-ingress
+  namespace: default
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: ubuntu-health.lumo.local
+    http:
+      paths:
+      - path: /health
+        pathType: Prefix
+        backend:
+          service:
+            name: ubuntu-health-test-service
+            port:
+              number: 80
