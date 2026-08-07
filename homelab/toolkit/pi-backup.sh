@@ -12,6 +12,7 @@ ICON="/run/media/toadie/data/Dev/Bash/AlienHand8080.jpg"
 REMOTE_USER="toadie"
 REMOTE_HOST="192.168.178.210"
 REMOTE_PATH="/home/toadie"
+REMOTE_DATA_PATH="/media/toadie/clusterdata"
 
 LOCAL_BACKUP_DIR="/home/toadie/Projekte/"
 
@@ -35,8 +36,10 @@ function index
 }
 
 
+function nfs-data {
+  rsync -avz -e ssh toadie@192.168.178.210:$REMOTE_DATA_PATH /home/toadie/Projekte/	
+}
 
-#rsync -avz -e ssh --exclude '/proc' --exclude '/sys' --exclude '/tmp' --exclude '/dev' --exclude '.cache/go-build' toadie@192.168.178.210:/home/toadie /home/toadie/Projekte/
 
 function test {
   for i in "${!RPI_IPS[@]}"; do
@@ -71,3 +74,4 @@ done
 
 index
 test
+nfs-data
