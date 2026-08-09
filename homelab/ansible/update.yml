@@ -2,7 +2,7 @@
 - name: Update Raspberry Pi Cluster
   hosts: pi_cluster
   become: yes
-  serial: 1                       # EINE Node nach der anderen!
+  serial: 1                       # one node at a time!
   gather_facts: yes
   
   tasks:

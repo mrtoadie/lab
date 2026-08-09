@@ -1,0 +1,18 @@
+# velero-schedule-selector.yaml
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: daily-full-ttt
+  namespace: velero
+spec:
+  schedule: "10 9 * * *"
+  template:
+    includedNamespaces:
+      - default
+      - monitoring
+    excludedResources:
+      - events
+      - endpoints
+      - metrics.k8s.io/*
+    snapshotMoveData: true
+    ttl: 720h

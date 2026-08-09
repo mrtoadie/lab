@@ -1,5 +1,5 @@
 ---
-- name: Git Repository auf allen Nodes synchronisieren
+- name: Synchronize Git repository on all nodes
   hosts: pi_cluster
   become: false
   vars:
@@ -9,13 +9,13 @@
     git_user: "toadie"
     
   tasks:
-    # 1. Repository klonen (falls nicht vorhanden)
-    - name: Repository existieren prüfen
+    # 1. Clone repository (if not present)
+    - name: Check repository exists
       ansible.builtin.stat:
         path: "{{ repo_dest }}"
       register: repo_stat
 
-    - name: Repository clonen
+    - name: Clone Repository
       ansible.builtin.git:
         repo: "{{ repo_url }}"
         dest: "{{ repo_dest }}"
@@ -24,8 +24,8 @@
       when: not repo_stat.stat.exists
       register: clone_result
 
-    # 2. Repository pullen (falls bereits vorhanden)
-    - name: Repository pullen
+    # 2. Pull repository (if already exists)
+    - name: Pull Repository
       ansible.builtin.command:
         cmd: git pull origin {{ repo_branch }}
         chdir: "{{ repo_dest }}"
@@ -33,8 +33,8 @@
       register: pull_result
       changed_when: "'Already up to date' not in pull_result.stdout"
 
-    # 3. Status anzeigen
-    - name: Pull-Ergebnis protokollieren
+    # 3. Show status
+    - name: Log pull result
       ansible.builtin.debug:
         msg: |
           Host: {{ inventory_hostname }}

@@ -1,0 +1,71 @@
+# velero-alerts.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: velero-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring  # ⬅ Muss zu deinem Prometheus Stack passen
+spec:
+  groups:
+    - name: velero.rules
+      rules:
+        # Critical: Backup schlägt fehl
+        - alert: VeleroBackupFailing
+          expr: rate(velero_backup_failure_total[1h]) > 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero Backup schlägt fehl"
+            description: "Backup {{ $labels.backup }} ist seit 10 Minuten gescheitert."
+        
+        # Warning: Teilweise fehlgeschlagene Backups
+        - alert: VeleroBackupPartialFailure
+          expr: rate(velero_backup_partial_failure_total[1h]) > 0
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Velero Backup teilweise fehlgeschlagen"
+            description: "Backup {{ $labels.backup }} hatte teils Fehler."
+        
+        # Warning: Kein Backup in den letzten 24 Stunden
+        - alert: VeleroBackupNotRunToday
+          expr: time() - velero_backup_last_attempt_timestamp_seconds > 86400
+          for: 2h
+          labels:
+            severity: warning
+          annotations:
+            summary: "Kein Velero Backup in den letzten 24h"
+            description: "Das letzte Backup war vor {{ $value }} Sekunden (> 24 Stunden)."
+        
+        # Critical: Restore schlägt fehl
+        - alert: VeleroRestoreFailing
+          expr: rate(velero_restore_failure_total[1h]) > 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero Restore schlägt fehl"
+            description: "Restore {{ $labels.restore }} ist gescheitert."
+        
+        # Warning: Backup Location nicht verfügbar (MinIO offline)
+        - alert: VeleroBackupStorageUnavailable
+          expr: up{job="velero"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero Backup Storage nicht erreichbar"
+            description: "Die Backup-Location (MinIO) ist seit 5 Minuten nicht erreichbar."
+        
+        # Info: Große Backup-Duration (> 2 Stunden)
+        - alert: VeleroBackupSlow
+          expr: velero_backup_duration_seconds > 7200
+          for: 1h
+          labels:
+            severity: info
+          annotations:
+            summary: "Backup dauert ungewöhnlich lange"
+            description: "Backup {{ $labels.backup }} läuft seit mehr als 2 Stunden."
