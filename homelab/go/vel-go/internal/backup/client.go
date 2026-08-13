@@ -1,0 +1,210 @@
+package backup
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"os/exec"
+	"strings"
+	"time"
+
+	"vel-go/internal/logger"
+)
+
+type ExecuteFunc func(name string, args ...string) (string, error)
+
+func DefaultExecute(name string, args ...string) (string, error) {
+	cmd := exec.Command(name, args...)
+	output, err := cmd.CombinedOutput()
+	return string(output), err
+}
+
+type ClientOption func(*Client)
+
+func WithExecuteFunc(fn ExecuteFunc) ClientOption {
+	return func(c *Client) {
+		c.executeFn = fn
+	}
+}
+
+func WithLogger(l *logger.Logger) ClientOption {
+	return func(c *Client) {
+		c.logger = l
+	}
+}
+
+type Client struct {
+	binary    string
+	executeFn ExecuteFunc
+	logger    *logger.Logger
+}
+
+func NewClient(binary string, opts ...ClientOption) *Client {
+	c := &Client{
+		binary:    binary,
+		executeFn: DefaultExecute,
+	}
+
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	return c
+}
+
+func (c *Client) execute(args ...string) (string, error) {
+	return c.executeFn(c.binary, args...)
+}
+
+func (c *Client) ListBackups(ctx context.Context, namespace string, allNamespaces bool) ([]*Backup, error) {
+	args := []string{"backup", "get"}
+
+	if allNamespaces {
+		args = append(args, "-A")
+	}
+
+	start := time.Now()
+	output, err := c.execute(args...)
+	duration := time.Since(start)
+
+	if c.logger != nil {
+		c.logger.LogAction("list_backups", "", duration, err == nil)
+	}
+
+	if err != nil {
+		if c.logger != nil {
+			c.logger.LogError("list_backups", "", err)
+		}
+		return nil, fmt.Errorf("velero command failed: %w", err)
+	}
+
+	backups, err := ParseOutput(output)
+	if err != nil {
+		return nil, err
+	}
+
+	return backups, nil
+}
+
+func (c *Client) DeleteBackup(ctx context.Context, name string, confirm bool) error {
+	args := []string{"backup", "delete", name}
+
+	if confirm {
+		args = append(args, "--confirm")
+	}
+
+	start := time.Now()
+	output, err := c.execute(args...)
+	duration := time.Since(start)
+
+	if c.logger != nil {
+		c.logger.LogAction("delete_backup", name, duration, err == nil)
+	}
+
+	if err != nil {
+		errMsg := strings.ToLower(string(output))
+
+		if strings.Contains(errMsg, "not found") {
+			return fmt.Errorf("backup '%s' not found", name)
+		}
+		if strings.Contains(errMsg, "already deleting") {
+			return fmt.Errorf("backup '%s' is already being deleted", name)
+		}
+
+		return fmt.Errorf("failed to delete backup '%s': %w", name, err)
+	}
+
+	return nil
+}
+
+func (c *Client) BatchDelete(ctx context.Context, names []string, dryRun bool, allowPartial bool) *BatchResult {
+	result := &BatchResult{
+		Total:   len(names),
+		Success: 0,
+		Failed:  0,
+		Results: make([]BackupResult, 0, len(names)),
+	}
+
+	if dryRun {
+		for _, name := range names {
+			result.Results = append(result.Results, BackupResult{
+				Name:     name,
+				Success:  true,
+				Error:    nil,
+				Duration: 0,
+			})
+			result.Success++
+		}
+		return result
+	}
+
+	for i, name := range names {
+		start := time.Now()
+		err := c.DeleteBackup(ctx, name, true)
+		duration := time.Since(start)
+
+		res := BackupResult{
+			Name:     name,
+			Duration: duration,
+		}
+
+		if err != nil {
+			res.Success = false
+			res.Error = err
+			result.Failed++
+		} else {
+			res.Success = true
+			result.Success++
+		}
+
+		result.Results = append(result.Results, res)
+
+		if c.logger != nil {
+			if err != nil {
+				c.logger.LogError("batch_delete", name, err)
+			} else {
+				c.logger.LogAction("batch_delete", name, duration, true)
+			}
+		}
+
+		if !allowPartial && err != nil {
+			break
+		}
+
+		if i < len(names)-1 {
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
+
+	return result
+}
+
+func (c *Client) CheckVersion() (string, error) {
+	output, err := c.execute("version", "--short")
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(output), nil
+}
+
+func (c *Client) IsAvailable() error {
+	_, err := c.execute("help")
+	return err
+}
+
+func (c *Client) GetBackupDetails(ctx context.Context, name string) (*Backup, error) {
+	args := []string{"backup", "describe", name}
+
+	output, err := c.execute(args...)
+	if err != nil {
+		return nil, err
+	}
+
+	backups, err := ParseOutput(output)
+	if err != nil || len(backups) == 0 {
+		return nil, errors.New("could not parse backup details")
+	}
+
+	return backups[0], nil
+}

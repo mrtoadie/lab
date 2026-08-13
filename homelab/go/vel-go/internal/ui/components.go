@@ -1,0 +1,179 @@
+package ui
+
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/charmbracelet/huh"
+	"vel-go/internal/backup"
+)
+
+type SelectionResult struct {
+	Selected    []*backup.Backup
+	ShouldExit  bool
+	Confirmed   bool
+}
+
+func ShowLoading(message string) {
+	fmt.Println("🔄 " + message)
+}
+
+func ShowError(message string) {
+	fmt.Printf("❌ Fehler: %s\n", message)
+}
+
+func ShowWarning(message string) {
+	fmt.Printf("⚠️  Warnung: %s\n", message)
+}
+
+func ShowInfo(title string, message string) {
+	fmt.Printf("ℹ️  %s\n", title)
+	if message != "" {
+		fmt.Printf("   %s\n", message)
+	}
+}
+
+func ShowSuccess(message string) {
+	fmt.Printf("✅ %s\n", message)
+}
+
+func CreateBackupOptions(backups []*backup.Backup, maxDisplay int) []huh.Option[int] {
+	displayBackups := backups
+	if maxDisplay > 0 && len(backups) > maxDisplay {
+		displayBackups = backups[:maxDisplay]
+	}
+
+	opts := make([]huh.Option[int], len(displayBackups))
+
+	for i, b := range displayBackups {
+		opts[i] = huh.NewOption(formatBackupLabel(b), i)
+	}
+
+	return opts
+}
+
+func formatBackupLabel(b *backup.Backup) string {
+	emoji := "✓"
+	if b.Status == backup.StatusFailed {
+		emoji = "✗"
+	} else if b.Status == backup.StatusPartial {
+		emoji = "⚠️"
+	}
+
+	dateStr := b.Created.Format("2006-01-02 15:04")
+
+	statusIndicator := ""
+	if b.Errors > 0 {
+		statusIndicator += fmt.Sprintf(" ERR:%d", b.Errors)
+	}
+	if b.Warnings > 0 {
+		statusIndicator += fmt.Sprintf(" WRN:%d", b.Warnings)
+	}
+
+	ageIndicator := ""
+	if b.AgeDays() > 0 {
+		ageIndicator = fmt.Sprintf(" (%dd)", b.AgeDays())
+	}
+
+	label := fmt.Sprintf("%s %-35s [%-8s] %s%s%s",
+			     emoji, b.Name, string(b.Status), dateStr, statusIndicator, ageIndicator)
+
+	return label
+}
+
+func SelectBackups(backups []*backup.Backup, maxDisplay int) []int {
+	if len(backups) == 0 {
+		return nil
+	}
+
+	opts := CreateBackupOptions(backups, maxDisplay)
+
+	var selectedIndexes []int
+
+	group := huh.NewGroup(
+		huh.NewMultiSelect[int]().
+		Title(fmt.Sprintf("Backups zum Löschen wählen (%d verfügbar)", len(backups))).
+		Description("Leertaste zum Markieren, Enter zum Bestätigen").
+		Options(opts...).
+		Limit(0).
+		Value(&selectedIndexes),
+	)
+
+	form := huh.NewForm(group)
+
+		if err := form.Run(); err != nil {
+			return nil
+		}
+
+		return selectedIndexes
+}
+
+func ConfirmDeletion(names []string) bool {
+	if len(names) == 0 {
+		return false
+	}
+
+	backupList := strings.Join(names, "\n  • ")
+
+	var confirmed bool
+
+	confirm := huh.NewConfirm().
+	Title(fmt.Sprintf("🗑️  %d Backup(s) wirklich löschen?", len(names))).
+	Description(fmt.Sprintf("Ausgewählt:\n  • %s\n\n⚠️  Diese Aktion ist unwiderruflich!", backupList)).
+	Value(&confirmed)
+
+	group := huh.NewGroup(confirm)
+	form := huh.NewForm(group)
+
+		if err := form.Run(); err != nil {
+			return false
+		}
+
+		return confirmed
+}
+
+func ShowSummary(result *backup.BatchResult) {
+	fmt.Println("\n" + strings.Repeat("─", 40))
+
+	if result.Failed == 0 {
+		fmt.Printf("✅ Alle %d Backups erfolgreich gelöscht!\n", result.Success)
+	} else {
+		fmt.Printf("⚠️  %d/%d erfolgreich, %d fehlgeschlagen\n",
+			   result.Success, result.Total, result.Failed)
+
+		fmt.Println("\nFehlgeschlagene:")
+		for _, r := range result.Results {
+			if !r.Success {
+				fmt.Printf("  • %s: %v\n", r.Name, r.Error)
+			}
+		}
+	}
+
+	if len(result.Results) > 0 {
+		totalDuration := time.Duration(0)
+		for _, r := range result.Results {
+			totalDuration += r.Duration
+		}
+		avgDuration := totalDuration / time.Duration(len(result.Results))
+		fmt.Printf("\nDurchschnittliche Dauer: %v pro Backup\n", avgDuration.Truncate(time.Millisecond))
+	}
+}
+
+func ShowPreview(names []string, dryRun bool) {
+	fmt.Println("\n" + strings.Repeat("─", 40))
+
+	if dryRun {
+		fmt.Println("🔍 VORANSICHT (Dry-Run)")
+		fmt.Println("Keine Backups werden tatsächlich gelöscht!")
+		fmt.Println()
+	}
+
+	fmt.Printf("Geplant zum Löschen: %d Backup(s)\n\n", len(names))
+
+	for _, name := range names {
+		fmt.Printf("  • %s\n", name)
+	}
+
+	fmt.Println()
+}

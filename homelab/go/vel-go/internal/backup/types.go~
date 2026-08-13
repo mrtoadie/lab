@@ -1,0 +1,71 @@
+package backup
+
+import "time"
+
+type Status string
+
+const (
+	StatusCompleted Status = "Completed"
+	StatusFailed    Status = "Failed"
+	StatusPartial   Status = "Partial"
+	StatusPending   Status = "Pending"
+	StatusDeleting  Status = "Deleting"
+)
+
+type Backup struct {
+	Name        string
+	Status      Status
+	Errors      int
+	Warnings    int
+	Created     time.Time
+	ExpiresIn   string
+	RestoreCount int
+	Namespace   string
+}
+
+type BatchResult struct {
+	Total   int
+	Success int
+	Failed  int
+	Results []BackupResult
+}
+
+type BackupResult struct {
+	Name     string
+	Success  bool
+	Error    error
+	Duration time.Duration
+}
+
+// Helper methods nur für Backup-Struct
+
+func (b *Backup) Label() string {
+	emoji := "✓"
+	if b.Status == StatusFailed {
+		emoji = "✗"
+	} else if b.Status == StatusPartial {
+		emoji = "⚠️"
+	}
+
+	statusIndicator := ""
+	if b.Errors > 0 {
+		statusIndicator += fmt.Sprintf(" ERR:%d", b.Errors)
+	}
+	if b.Warnings > 0 {
+		statusIndicator += fmt.Sprintf(" WRN:%d", b.Warnings)
+	}
+
+	return fmt.Sprintf("%s %s [%s]%s", emoji, b.Name, b.Status, statusIndicator)
+}
+
+func (b *Backup) IsExpired() bool {
+	return time.Since(b.Created) > 30*24*time.Hour
+}
+
+func (b *Backup) AgeDays() int {
+	return int(time.Since(b.Created).Hours() / 24)
+}
+
+func (b *Backup) HasIssues() bool {
+	return b.Status == StatusFailed || b.Status == StatusPartial || b.Errors > 0
+}
