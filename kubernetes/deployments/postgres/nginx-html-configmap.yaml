@@ -1,0 +1,25 @@
+# nginx-html-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-html
+  namespace: test-db
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head><title>K3s Test Deployment</title></head>
+    <body>
+      <h1>🎉 Success!</h1>
+      <p>Nginx läuft auf deinem k3s Cluster (winterfell)</p>
+      <p>PostgreSQL ist bereit unter: <code>postgres.test-db.svc.cluster.local:5432</code></p>
+      <hr/>
+      <h2>Test DB Verbindung:</h2>
+      <pre>
+Host: postgres.test-db.svc.cluster.local
+Port: 5432
+User: testuser
+DB: testdb
+      </pre>
+    </body>
+    </html>
