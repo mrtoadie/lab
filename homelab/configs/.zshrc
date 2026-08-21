@@ -70,9 +70,11 @@ ZSH_THEME="mira"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git kubectl helm)
+plugins=(git kubectl helm zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
+autoload -Uz compinit
+compinit -u
 
 [[ -f ~/.zsh-aliases ]] && . ~/.zsh-aliases
 
@@ -108,3 +110,4 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
