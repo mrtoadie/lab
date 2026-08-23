@@ -1,0 +1,52 @@
+# stress-test-app-fixed.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stress-test
+  namespace: default
+spec:
+  replicas: 8
+  selector:
+    matchLabels:
+      app: stress-test
+  template:
+    metadata:
+      labels:
+        app: stress-test
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values: ["stress-test"]
+                topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: stresser
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              # Einfache CPU-Last durch leere Schleifen
+              while true; do
+                x=$((RANDOM % 1000000))
+                sleep 0.01
+              done
+          resources:
+            limits:
+              cpu: "1"        # Reduziert von 2 cores
+              memory: "256Mi" # Reduziert von 512Mi
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+          readinessProbe:
+            exec:
+              command: ["echo", "ready"]
+            initialDelaySeconds: 3
+            periodSeconds: 10
+      terminationGracePeriodSeconds: 30
