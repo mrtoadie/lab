@@ -405,10 +405,11 @@ function BackupStatus {
   velero_deployed=$(clean_number "$velero_deployed")
 
   if [ "$velero_deployed" -gt 0 ]; then
-    success "Velero Backup installed"
-    backups_scheduled=$(velero backup get 2>/dev/null | grep -c Scheduled || echo "0")
-    backups_scheduled=$(clean_number "$backups_scheduled")
+    success "Velero Backup installed"    
+    backups_scheduled=$(velero schedule get | wc -l)
     info "Scheduled Backups: $backups_scheduled"
+    backups_non_scheduled=$(velero backup get | wc -l)
+    info "Non-Scheduled Backups: $backups_non_scheduled"
   else
     warn "No Velero backup installed!"
   fi
