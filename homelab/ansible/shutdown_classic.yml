@@ -1,0 +1,10 @@
+---
+- name: Shutdown Remote Hosts
+  hosts: pi_cluster
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Shutdown now
+      ansible.builtin.command: shutdown -h now
+      ignore_errors: yes  # Prevent Ansible from marking playbook as failed

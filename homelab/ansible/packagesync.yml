@@ -1,0 +1,48 @@
+---
+- name: Package sync from worker01 to other workers
+  hosts: k3s_workers
+  become: true
+  gather_facts: false
+  
+  vars:
+    base_host: worker01
+  
+  tasks:
+    # ========== PACKAGELISTE VON worker01 HOLEN ==========
+    - name: Export package list from base host
+      delegate_to: "{{ base_host }}"
+      shell: dpkg --get-selections | grep install | cut -f1
+      register: base_packages
+      run_once: true
+      changed_when: false
+    
+    # ========== COMPARE & INSTALL ==========
+    - name: Skip base host
+      meta: end_host
+      when: inventory_hostname == base_host
+    
+    - name: Get locally installed packages
+      shell: dpkg --get-selections | grep install | cut -f1
+      register: local_packages
+      changed_when: false
+    
+    - name: Find missing packages
+      set_fact:
+        missing: "{{ base_packages.stdout_lines | difference(local_packages.stdout_lines) }}"
+    
+    - name: Show diff
+      debug:
+        msg: >
+          {{ inventory_hostname }}: {{ missing | length }} fehlende Pakete
+          {% if missing | length > 0 and missing | length <= 10 %}
+           → {{ missing | join(', ') }}
+          {% elif missing | length > 10 %}
+           → {{ missing[:10] | join(', ') }} ... und {{ missing | length - 10 }} weitere
+          {% endif %}
+    
+    - name: Install missing packages
+      apt:
+        name: "{{ missing }}"
+        state: present
+        update_cache: true
+      when: missing | length > 0
