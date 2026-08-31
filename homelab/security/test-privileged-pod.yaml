@@ -1,0 +1,12 @@
+# test-privileged-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-priv
+  namespace: testing-linux
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      privileged: true

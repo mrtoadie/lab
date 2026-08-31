@@ -1,0 +1,11 @@
+# test-hostnetwork.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-hn
+  namespace: testing-linux
+spec:
+  hostNetwork: true
+  containers:
+  - name: curl
+    image: curlimages/curl
