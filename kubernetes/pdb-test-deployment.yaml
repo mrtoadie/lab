@@ -1,0 +1,27 @@
+# pdb-test-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdb-test
+  labels:
+    app: pdb-test
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: pdb-test
+  template:
+    metadata:
+      labels:
+        app: pdb-test
+    spec:
+      containers:
+      - name: pause
+        image: registry.k8s.io/pause:3.10
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"

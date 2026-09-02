@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"uptime-kuma"},"name":"uptime-kuma","namespace":"monitoring"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"uptime-kuma"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app":"uptime-kuma"}},"spec":{"containers":[{"image":"louislam/uptime-kuma:2","imagePullPolicy":"Always","livenessProbe":{"httpGet":{"path":"/","port":3001},"initialDelaySeconds":30,"periodSeconds":30},"name":"uptime-kuma","ports":[{"containerPort":3001}],"readinessProbe":{"httpGet":{"path":"/","port":3001},"initialDelaySeconds":10,"periodSeconds":10},"resources":{"limits":{"cpu":"300m","memory":"512Mi"},"requests":{"cpu":"50m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/app/data","name":"data"}]}],"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"uptime-kuma-data"}}]}}}}
+  creationTimestamp: "2026-07-30T16:08:40Z"
+  generation: 4
+  labels:
+    app: uptime-kuma
+  name: uptime-kuma
+  namespace: monitoring
+  resourceVersion: "809704"
+  uid: 5b3d36cf-b827-4298-aad9-a6fa85330658
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: uptime-kuma
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-07-30T18:21:43+02:00"
+      labels:
+        app: uptime-kuma
+    spec:
+      containers:
+      - image: louislam/uptime-kuma:2
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 3001
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: uptime-kuma
+        ports:
+        - containerPort: 3001
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 3001
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 300m
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /app/data
+          name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: uptime-kuma-data
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-07-30T16:08:40Z"
+    lastUpdateTime: "2026-07-30T16:22:32Z"
+    message: ReplicaSet "uptime-kuma-5c57fb669d" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-08-31T19:15:34Z"
+    lastUpdateTime: "2026-08-31T19:15:34Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  terminatingReplicas: 0
+  updatedReplicas: 1

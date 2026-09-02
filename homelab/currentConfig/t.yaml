@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/restartedAt: "2026-07-30T18:21:43+02:00"
+  labels:
+    app: uptime-kuma
+    pod-template-hash: 5c57fb669d
+  name: uptime-kuma-5c57fb669d-p4h44
+  namespace: monitoring
+spec:
+  containers:
+  - image: louislam/uptime-kuma:2
+    imagePullPolicy: Always
+    livenessProbe:
+      httpGet:
+        port: 3001
+      initialDelaySeconds: 30
+      periodSeconds: 30
+    name: uptime-kuma
+    ports:
+    - containerPort: 3001
+    readinessProbe:
+      httpGet:
+        port: 3001
+      initialDelaySeconds: 10
+    resources:
+      limits:
+        cpu: 300m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+    volumeMounts:
+    - mountPath: /app/data
+      name: data
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xfwgj
+      readOnly: true
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  serviceAccountName: default
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: uptime-kuma-data
+  - name: kube-api-access-xfwgj
+    projected:
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              fieldPath: metadata.namespace
+            path: namespace

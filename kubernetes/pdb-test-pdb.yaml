@@ -1,0 +1,10 @@
+# pdb-test-pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-test
+spec:
+  minAvailable: 2        # von 3 Replicas: maximal 1 darf evicted werden
+  selector:
+    matchLabels:
+      app: pdb-test

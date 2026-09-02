@@ -1,19 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubuntu-dev
+  name: ubuntu-dev-new
   labels:
-    app: ubuntu-dev
+    app: ubuntu-dev-new
     env: local
 spec:
-  replicas: 1
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
-      app: ubuntu-dev
+      app: ubuntu-dev-new
   template:
     metadata:
       labels:
-        app: ubuntu-dev
+        app: ubuntu-dev-new
         env: local
     spec:
       containers:

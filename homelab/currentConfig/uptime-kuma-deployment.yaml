@@ -1,0 +1,108 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "labels": {
+      "app": "uptime-kuma"
+    },
+    "name": "uptime-kuma",
+    "namespace": "monitoring"
+  },
+  "spec": {
+    "replicas": 1,
+    "selector": {
+      "matchLabels": {
+        "app": "uptime-kuma"
+      }
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "uptime-kuma"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "image": "louislam/uptime-kuma:2",
+            "imagePullPolicy": "Always",
+            "livenessProbe": {
+              "httpGet": {
+                "path": "/",
+                "port": 3001
+              },
+              "initialDelaySeconds": 30,
+              "periodSeconds": 30
+            },
+            "name": "uptime-kuma",
+            "ports": [
+              {
+                "containerPort": 3001
+              }
+            ],
+            "readinessProbe": {
+              "httpGet": {
+                "path": "/",
+                "port": 3001
+              },
+              "initialDelaySeconds": 10,
+              "periodSeconds": 10,
+              "timeoutSeconds": 1
+            },
+            "resources": {
+              "limits": {
+                "cpu": "300m",
+                "memory": "512Mi"
+              },
+              "requests": {
+                "cpu": "50m",
+                "memory": "128Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/app/data",
+                "name": "data"
+              }
+            ]
+          }
+        ],
+        "securityContext": {},
+        "volumes": [
+          {
+            "name": "data",
+            "persistentVolumeClaim": {
+              "claimName": "uptime-kuma-data"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "status": {
+    "availableReplicas": 1,
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-07-30T16:08:40Z",
+        "lastUpdateTime": "2026-07-30T16:22:32Z",
+        "message": "ReplicaSet \"uptime-kuma-5c57fb669d\" has successfully progressed.",
+        "reason": "NewReplicaSetAvailable",
+        "status": "True",
+        "type": "Progressing"
+      },
+      {
+        "lastTransitionTime": "2026-09-01T18:42:58Z",
+        "lastUpdateTime": "2026-09-01T18:42:58Z",
+        "message": "Deployment has minimum availability.",
+        "reason": "MinimumReplicasAvailable",
+        "status": "True",
+        "type": "Available"
+      }
+    ],
+    "observedGeneration": 4,
+    "readyReplicas": 1,
+    "replicas": 1,
+    "terminatingReplicas": 0,
+    "updatedReplicas": 1
+  }
+}
