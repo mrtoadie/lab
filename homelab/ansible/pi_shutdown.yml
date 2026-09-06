@@ -1,0 +1,17 @@
+---
+- name: Controlled shutdown sequence
+  hosts: pi_cluster
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Notify logged-in users before shutdown
+      ansible.builtin.debug:
+        msg: "System going down in 5 minutes — save your work!"
+
+    - name: Wait for grace period
+      ansible.builtin.wait_for:
+        timeout: 300
+
+    - name: Shut down now
+      ansible.builtin.command: /sbin/shutdown -h now

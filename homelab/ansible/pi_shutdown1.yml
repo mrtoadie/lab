@@ -1,0 +1,13 @@
+---
+# pi_shutdown.yml — Alle Pis sauber herunterfahren
+# Usage: ansible-playbook -i inventory.ini pi_shutdown.yml -K
+
+- name: Controlled shutdown
+  hosts: pi_cluster
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Shut down the Pis
+      community.general.shutdown:
+      # Der Shoredown läuft asynchron, damit SSH nicht "kaputtgegangen" meldet

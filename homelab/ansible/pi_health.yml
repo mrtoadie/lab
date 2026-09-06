@@ -1,0 +1,73 @@
+---
+# pi_health.yml — Collect metrics, then print one table
+# Usage: ansible-playbook -i hosts.ini pi_health.yml
+
+- name: Raspberry Pi health check
+  hosts: pi_cluster
+  become: false
+  gather_facts: true
+
+  tasks:
+    - name: Read disk usage
+      ansible.builtin.shell: df -PB1 / | awk 'NR==2 {printf "%.1f", $3/$2*100}'
+      args:
+        executable: /bin/bash
+      register: disk_raw
+      changed_when: false
+
+    - name: Read RAM usage
+      ansible.builtin.shell: free -b | awk '/^Mem:/ {printf "%.1f", $3/$2*100}'
+      args:
+        executable: /bin/bash
+      register: ram_raw
+      changed_when: false
+
+    - name: Read 1-minute load average
+      ansible.builtin.command: awk '{print $1}' /proc/loadavg
+      register: load_raw
+      changed_when: false
+
+    - name: Read SoC temperature
+      ansible.builtin.command: cat /sys/class/thermal/thermal_zone0/temp
+      register: temp_raw
+      changed_when: false
+
+    - name: Store metrics
+      ansible.builtin.set_fact:
+        metrics:
+          disk: "{{ disk_raw.stdout | float }}"
+          ram: "{{ ram_raw.stdout | float }}"
+          load: "{{ load_raw.stdout | float }}"
+          temp: "{{ (temp_raw.stdout | int) / 1000 }}"
+
+# ---- Second play: render table on the controller -----------------------------
+- name: Show health table
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Render table to local file
+      ansible.builtin.copy:
+        dest: /tmp/pi_health.txt
+        content: |
+          HOST          DISK %   RAM %  LOAD 1M  TEMP C
+          ----------------------------------------------
+          {% for h in groups['pi_cluster'] %}
+          {% set m = hostvars[h].get('metrics', {}) %}
+          {{ '%-12s %7s %7s %8s %7s' | format(h, m.get('disk','-')|string, m.get('ram','-')|string, m.get('load','-')|string, (m.get('temp',0)|float|round(1))|string) }}
+          {% endfor %}
+      delegate_to: localhost
+      run_once: true
+      register: table_file
+
+    - name: Show table
+      ansible.builtin.command: cat /tmp/pi_health.txt
+      delegate_to: localhost
+      run_once: true
+      changed_when: false
+      register: out
+
+    - name: Output
+      ansible.builtin.debug:
+        var: out.stdout_lines
+      vars:
+        out: "{{ hostvars['localhost'].table_result | default(hostvars['localhost']['cat_result']) }}"
