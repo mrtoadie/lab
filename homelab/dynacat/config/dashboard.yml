@@ -1,0 +1,129 @@
+- name: Dashboard
+  width: default
+  center-vertically: true
+  name-icon: mdi:home
+  columns:
+    - size: full
+      widgets:
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: docker-containers
+              frameless: true
+              running-only: true
+              hide-by-default: false
+            - type: docker-containers
+              frameless: true
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: docker-controller
+              frameless: false
+              show: containers
+              title-icon: si:docker
+              format-container-names: true
+              title: containers
+            - type: docker-controller
+              show: images
+              format-container-names: true
+              title: images
+              title-icon: mdi:docker
+          title: docker
+          title-icon: si:docker
+        - type: monitor
+          sites:
+            - title: AudioBookShelf
+              url: http://localhost:13378/
+              icon: si:audiobookshelf
+              description: local
+        - type: monitor
+          cache: 1m
+          title: K3S Cluster
+          sites:
+            - title: Grafana
+              url: http://grafana.local/
+              icon: si:grafana
+              description: K3S
+            - title: Uptime-Kuma
+              url: http://192.168.178.210:3001
+              icon: si:uptimekuma
+              description: K3S
+              check-url: http://192.168.178.210:32001/dashboard
+            - title: toadie.de/rss
+              url: https://toadie.de/rssread/
+              icon: si:rss
+              description: Web
+            - title: Forgejo
+              url: http://192.168.178.210:30080/
+              icon: si:forgejo
+              description: K3S
+            - title: AudioBookShelf
+              url: http://localhost:13378/
+              icon: si:audiobookshelf
+              description: Docker
+          show-history: true
+          title-icon: di:kubernetes
+          show-failing-only: false
+        - type: search
+          autofocus: true
+          autocomplete: true
+          autocomplete-provider: brave
+          search-engine: brave
+          title-icon: di:brave
+        - type: bookmarks
+          groups:
+            - title: Dev
+              hide-arrow: true
+              links:
+                - title: Github
+                  url: https://github.com/mrtoadie
+                  icon: si:github
+                  description: MrToadie
+                - title: AUR
+                  url: https://aur.archlinux.org/account/mrtoadie
+                  icon: si:archlinux
+                  description: AUR
+                - title: Codeberg
+                  url: https://codeberg.org
+                  icon: si:codeberg
+            - title: Cluster
+              color: 10 70 50
+              hide-arrow: true
+              links:
+                - title: Grafana
+                  url: http://grafana.local/
+                  icon: si:grafana
+                - title: Uptime-Kuma
+                  url: http://192.168.178.210:32001/dashboard
+                  icon: si:uptimekuma
+                - title: Forgejo
+                  url: https://www.disneyplus.com/
+                  icon: si:forgejo
+                  description: <nil>
+                - title: Prometheus
+                  url: <nil>
+                  icon: si:prometheus
+                - title: Velero
+                  url: <nil>
+                  icon: si:v
+            - title: Forums
+              color: 200 50 50
+              links:
+                - title: Linux Guides Community
+                  url: https://forum.linuxguides.de/
+                - title: Linux Community.io
+                  url: https://linuxcommunity.io/
+            - title: Learn
+              links:
+                - title: packt
+                  url: https://subscription.packtpub.com/owned
+            - title: Kubernetes
+              links:
+                - title: K8S Reference
+                  url: https://kubernetes.io/docs/reference/
+                  icon: si:kubernetes
+                  description: Documentation
+                - title: steven-garcia.dev
+                  url: https://www.steven-garcia.dev/
+                  description: Blog
+          title-icon: di:gitbook

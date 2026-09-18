@@ -1,0 +1,160 @@
+- name: Dasahboard2
+  # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
+  # hide-desktop-navigation: true
+  columns:
+    - size: small
+      widgets:
+        - type: clock
+          hour-format: 24h
+          hide-header: true
+        - type: weather
+          units: metric
+          hour-format: 24h
+          location: Frankfurt, Germany
+          show-area-name: true
+          update-interval: 30m
+        - type: releases
+          cache: 1d
+          repositories:
+            - Panonim/dynacat
+            - alexta69/metube
+            - advplyr/audiobookshelf
+            - mrtoadie/go-velero-manager
+            - syncthing/syncthing
+    - size: full
+      widgets:
+        - type: html
+          source: <h2 class="uppercase widget-title-wrapper"><span>Docker</span></h2>
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: server-stats
+              servers:
+                - name: toad
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  type: local
+                - name: winterfell
+                  url: http://192.168.178.210:27973
+                  compact: false
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: 1NmWH50WhsbtZmffynO882rEVYggnhaj
+                  type: remote
+                - name: worker01
+                  url: http://192.168.178.212:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: jtTST8b3tGpgHbUY6LPBtHFUFm8FeXim
+                  type: remote
+                - name: worker02
+                  url: http://192.168.178.214:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: LfExy31mmYB7rZObDYWwCPDaSHIh8497
+                  type: remote
+                - name: worker03
+                  url: http://192.168.178.216:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: A2T8ODXHXklOCvfvrBLbUlj92aVcTh7N
+                  type: remote
+            - type: monitor
+              cache: 1m
+              title: services
+              sites:
+                - title: Grafana
+                  url: http://grafana.local/
+                  icon: si:grafana
+                  description: K3S
+                - title: Uptime-Kuma
+                  url: http://192.168.178.210:3001
+                  icon: si:uptimekuma
+                  description: K3S
+                  check-url: http://192.168.178.210:32001/dashboard
+                - title: toadie.de/rss
+                  url: https://toadie.de/rssread/
+                  icon: si:rss
+                  description: Web
+                - title: Forgejo
+                  url: http://192.168.178.210:30080/
+                  icon: si:forgejo
+                  description: K3S
+                - title: AudioBookShelf
+                  url: http://localhost:13378/
+                  icon: si:audiobookshelf
+                  description: Docker
+              show-history: true
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: to-do
+              storage: local
+              title: To-Do
+              title-icon: si:obsidian
+          title: start
+        - type: split-column
+          max-columns: 3
+          widgets:
+            - type: repository
+              repository: mrtoadie/go-velero-manager
+              hide-header: false
+              title-icon: si:go
+              title: velero-manager
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+            - type: repository
+              repository: mrtoadie/go-check-cert
+              hide-header: false
+              title: cert-checker
+              title-icon: si:go
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+            - type: repository
+              repository: mrtoadie/kvm-configurator
+              hide-header: false
+              title-icon: si:go
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+              title: kvm-configurator
+          title-icon: si:github
+          cache: 1h
+          title: Repositories
+          update-interval: 1h
+          frameless: false
+          title-url: https://github.com/mrtoadie/
+          hide-header: false
+        - type: docker-controller
+        - type: split-column
+          max-columns: 3
+          widgets:
+            - type: group
+              frameless: true
+              title: music
+              widgets:
+                - type: videos
+                  channels:
+                    - UCx3swuFh-aY7DAIZPofgEcA
+                    - UCSNxIry_FPFcQDFRbi3VOAw
+                  style: vertical-list
+                  limit: 10
+                  update-interval: 1h
+                  title: Music
+                  title-icon: si:applemusic
+            - type: group
+              frameless: true
+              title: linux
+              widgets:
+                - type: videos
+                  channels:
+                    - UC9H0HzpKf5JlazkADWnW1Jw
+                  frameless: true
+                  style: vertical-list
+                  title: Linux
+                  title-icon: di:linux

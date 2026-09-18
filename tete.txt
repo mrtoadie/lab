@@ -1,0 +1,1684 @@
+================================================================================
+Configuration Files Inventory - Arch Linux - 2026-09-17 17:30:08
+================================================================================
+
+PACKAGE                      CONFIGS  PATH
+alsa-plugins                 15       /etc/
+                                      /etc/alsa/
+                                      /etc/alsa/conf.d/
+                                      /etc/alsa/conf.d/10-rate-lav.conf
+                                      /etc/alsa/conf.d/10-samplerate.conf
+                                      /etc/alsa/conf.d/10-speexrate.conf
+                                      /etc/alsa/conf.d/50-arcam-av-ctl.conf
+                                      /etc/alsa/conf.d/50-jack.conf
+                                      /etc/alsa/conf.d/50-oss.conf
+                                      /etc/alsa/conf.d/50-pulseaudio.conf
+                                      /etc/alsa/conf.d/60-a52-encoder.conf
+                                      /etc/alsa/conf.d/60-speex.conf
+                                      /etc/alsa/conf.d/60-upmix.conf
+                                      /etc/alsa/conf.d/60-vdownmix.conf
+                                      /etc/alsa/conf.d/98-usb-stream.conf
+ark                          3        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/arkrc
+at-spi2-core                 6        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/Xwayland-session.d/
+                                      /etc/xdg/Xwayland-session.d/00-at-spi
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/at-spi-dbus-bus.desktop
+attr                         2        /etc/
+                                      /etc/xattr.conf
+audit                        5        /etc/
+                                      /etc/audit/
+                                      /etc/audit/audit-stop.rules
+                                      /etc/audit/auditd.conf
+                                      /etc/libaudit.conf
+avahi                        7        /etc/
+                                      /etc/avahi/
+                                      /etc/avahi/avahi-autoipd.action
+                                      /etc/avahi/avahi-daemon.conf
+                                      /etc/avahi/avahi-dnsconfd.action
+                                      /etc/avahi/hosts
+                                      /etc/avahi/services/
+backintime-cli               4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/backintime.desktop
+baloo                        4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/baloo_file.desktop
+bash                         7        /etc/
+                                      /etc/bash.bash_logout
+                                      /etc/bash.bashrc
+                                      /etc/skel/
+                                      /etc/skel/.bash_logout
+                                      /etc/skel/.bash_profile
+                                      /etc/skel/.bashrc
+bind                         2        /etc/
+                                      /etc/named.conf
+binutils                     2        /etc/
+                                      /etc/gprofng.rc
+bluez                        5        /etc/
+                                      /etc/bluetooth/
+                                      /etc/bluetooth/input.conf
+                                      /etc/bluetooth/main.conf
+                                      /etc/bluetooth/network.conf
+brltty                       6        /etc/
+                                      /etc/X11/
+                                      /etc/X11/xinit/
+                                      /etc/X11/xinit/xinitrc.d/
+                                      /etc/X11/xinit/xinitrc.d/90xbrlapi
+                                      /etc/brltty.conf
+btrfs-assistant              2        /etc/
+                                      /etc/btrfs-assistant.conf
+ca-certificates-utils        17       /etc/
+                                      /etc/ca-certificates/
+                                      /etc/ca-certificates/README
+                                      /etc/ca-certificates/extracted/
+                                      /etc/ca-certificates/extracted/README
+                                      /etc/ca-certificates/trust-source/
+                                      /etc/ca-certificates/trust-source/README
+                                      /etc/ca-certificates/trust-source/anchors/
+                                      /etc/ca-certificates/trust-source/blocklist/
+                                      /etc/ssl/
+                                      /etc/ssl/README
+                                      /etc/ssl/cert.pem
+                                      /etc/ssl/certs/
+                                      /etc/ssl/certs/ca-bundle.crt
+                                      /etc/ssl/certs/ca-certificates.crt
+                                      /etc/ssl/certs/java/
+                                      /etc/ssl/certs/java/README
+cifs-utils                   6        /etc/
+                                      /etc/cifs-utils/
+                                      /etc/cifs-utils/idmap-plugin
+                                      /etc/request-key.d/
+                                      /etc/request-key.d/cifs.idmap.conf
+                                      /etc/request-key.d/cifs.spnego.conf
+cockpit                      11       /etc/
+                                      /etc/cockpit/
+                                      /etc/cockpit/disallowed-users
+                                      /etc/cockpit/machines.d/
+                                      /etc/cockpit/ws-certs.d/
+                                      /etc/issue.d/
+                                      /etc/issue.d/cockpit.issue
+                                      /etc/motd.d/
+                                      /etc/motd.d/cockpit
+                                      /etc/pam.d/
+                                      /etc/pam.d/cockpit
+containers-common            11       /etc/
+                                      /etc/containers/
+                                      /etc/containers/certs.d/
+                                      /etc/containers/containers.conf.d/
+                                      /etc/containers/networks/
+                                      /etc/containers/oci/
+                                      /etc/containers/oci/hooks.d/
+                                      /etc/containers/policy.json
+                                      /etc/containers/registries.conf.d/
+                                      /etc/containers/registries.d/
+                                      /etc/containers/systemd/
+cronie                       17       /etc/
+                                      /etc/anacrontab
+                                      /etc/cron.d/
+                                      /etc/cron.d/0hourly
+                                      /etc/cron.daily/
+                                      /etc/cron.deny
+                                      /etc/cron.hourly/
+                                      /etc/cron.hourly/0anacron
+                                      /etc/cron.monthly/
+                                      /etc/cron.weekly/
+                                      /etc/crontab
+                                      /etc/default/
+                                      /etc/default/anacron
+                                      /etc/pam.d/
+                                      /etc/pam.d/crond
+                                      /etc/sysconfig/
+                                      /etc/sysconfig/crond
+cups                         17       /etc/
+                                      /etc/cups/
+                                      /etc/cups/classes.conf
+                                      /etc/cups/cups-files.conf
+                                      /etc/cups/cups-files.conf.default
+                                      /etc/cups/cupsd.conf
+                                      /etc/cups/cupsd.conf.default
+                                      /etc/cups/ppd/
+                                      /etc/cups/printers.conf
+                                      /etc/cups/snmp.conf
+                                      /etc/cups/snmp.conf.default
+                                      /etc/cups/ssl/
+                                      /etc/cups/subscriptions.conf
+                                      /etc/logrotate.d/
+                                      /etc/logrotate.d/cups
+                                      /etc/pam.d/
+                                      /etc/pam.d/cups
+cups-pdf                     3        /etc/
+                                      /etc/cups/
+                                      /etc/cups/cups-pdf.conf
+dconf                        4        /etc/
+                                      /etc/dconf/
+                                      /etc/dconf/db/
+                                      /etc/dconf/db/.placeholder
+discover                     4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/org.kde.discover.notifier.desktop
+dkms                         4        /etc/
+                                      /etc/dkms/
+                                      /etc/dkms/framework.conf
+                                      /etc/dkms/framework.conf.d/
+dnsmasq                      2        /etc/
+                                      /etc/dnsmasq.conf
+dnssec-anchors               2        /etc/
+                                      /etc/trusted-key.key
+docbook-xml                  3        /etc/
+                                      /etc/xml/
+                                      /etc/xml/docbook-xml
+downgrade                    4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/downgrade/
+                                      /etc/xdg/downgrade/downgrade.conf
+e2fsprogs                    3        /etc/
+                                      /etc/e2scrub.conf
+                                      /etc/mke2fs.conf
+filesystem                   24       /etc/
+                                      /etc/arch-release
+                                      /etc/crypttab
+                                      /etc/fstab
+                                      /etc/group
+                                      /etc/gshadow
+                                      /etc/host.conf
+                                      /etc/hosts
+                                      /etc/issue
+                                      /etc/ld.so.conf
+                                      /etc/ld.so.conf.d/
+                                      /etc/mtab
+                                      /etc/nsswitch.conf
+                                      /etc/passwd
+                                      /etc/profile
+                                      /etc/profile.d/
+                                      /etc/profile.d/locale.sh
+                                      /etc/resolv.conf
+                                      /etc/securetty
+                                      /etc/shadow
+                                      /etc/shells
+                                      /etc/skel/
+                                      /etc/subgid
+                                      /etc/subuid
+flatpak                      5        /etc/
+                                      /etc/profile.d/
+                                      /etc/profile.d/flatpak-bindir.sh
+                                      /etc/profile.d/flatpak.csh
+                                      /etc/profile.d/flatpak.sh
+fluidsynth                   3        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/fluidsynth
+fontconfig                   5        /etc/
+                                      /etc/fonts/
+                                      /etc/fonts/conf.d/
+                                      /etc/fonts/conf.d/README
+                                      /etc/fonts/fonts.conf
+freetype2                    3        /etc/
+                                      /etc/profile.d/
+                                      /etc/profile.d/freetype2.sh
+fuse-common                  2        /etc/
+                                      /etc/fuse.conf
+gawk                         4        /etc/
+                                      /etc/profile.d/
+                                      /etc/profile.d/gawk.csh
+                                      /etc/profile.d/gawk.sh
+gdb                          3        /etc/
+                                      /etc/gdb/
+                                      /etc/gdb/gdbinit
+gimp                         10       /etc/
+                                      /etc/gimp/
+                                      /etc/gimp/3.0/
+                                      /etc/gimp/3.0/controllerrc
+                                      /etc/gimp/3.0/gimp.css
+                                      /etc/gimp/3.0/gimprc
+                                      /etc/gimp/3.0/sessionrc
+                                      /etc/gimp/3.0/templaterc
+                                      /etc/gimp/3.0/toolrc
+                                      /etc/gimp/3.0/unitrc
+glibc                        7        /etc/
+                                      /etc/gai.conf
+                                      /etc/locale.gen
+                                      /etc/rpc
+                                      /etc/tunables.conf
+                                      /etc/tunables.conf.d/
+                                      /etc/tunables.conf.d/shstk.conf
+glusterfs                    22       /etc/
+                                      /etc/bash_completion.d/
+                                      /etc/bash_completion.d/gluster.bash
+                                      /etc/ganesha/
+                                      /etc/ganesha/ganesha-ha.conf.sample
+                                      /etc/glusterfs/
+                                      /etc/glusterfs/eventsconfig.json
+                                      /etc/glusterfs/gluster-rsyslog-5.8.conf
+                                      /etc/glusterfs/gluster-rsyslog-7.2.conf
+                                      /etc/glusterfs/glusterd.vol
+                                      /etc/glusterfs/glusterfs-georep-logrotate
+                                      /etc/glusterfs/glusterfs-logrotate
+                                      /etc/glusterfs/group-db-workload
+                                      /etc/glusterfs/group-distributed-virt
+                                      /etc/glusterfs/group-gluster-block
+                                      /etc/glusterfs/group-metadata-cache
+                                      /etc/glusterfs/group-nl-cache
+                                      /etc/glusterfs/group-samba
+                                      /etc/glusterfs/group-virt.example
+                                      /etc/glusterfs/gsyncd.conf
+                                      /etc/glusterfs/logger.conf.example
+                                      /etc/glusterfs/thin-arbiter.vol
+gnome-disk-utility           4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/org.gnome.SettingsDaemon.DiskUtilityNotify.desktop
+gnome-keyring                5        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/gnome-keyring-pkcs11.desktop
+                                      /etc/xdg/autostart/gnome-keyring-secrets.desktop
+gnutls                       3        /etc/
+                                      /etc/gnutls/
+                                      /etc/gnutls/config
+gpm                          3        /etc/
+                                      /etc/profile.d/
+                                      /etc/profile.d/gpm.sh
+grub                         13       /etc/
+                                      /etc/default/
+                                      /etc/default/grub
+                                      /etc/grub.d/
+                                      /etc/grub.d/00_header
+                                      /etc/grub.d/10_linux
+                                      /etc/grub.d/20_linux_xen
+                                      /etc/grub.d/25_bli
+                                      /etc/grub.d/30_os-prober
+                                      /etc/grub.d/30_uefi-firmware
+                                      /etc/grub.d/40_custom
+                                      /etc/grub.d/41_custom
+                                      /etc/grub.d/README
+grub-btrfs                   6        /etc/
+                                      /etc/default/
+                                      /etc/default/grub-btrfs/
+                                      /etc/default/grub-btrfs/config
+                                      /etc/grub.d/
+                                      /etc/grub.d/41_snapshots-btrfs
+gssproxy                     9        /etc/
+                                      /etc/gss/
+                                      /etc/gss/mech.d/
+                                      /etc/gss/mech.d/proxymech.conf
+                                      /etc/gssproxy/
+                                      /etc/gssproxy/24-nfs-server.conf
+                                      /etc/gssproxy/80-httpd.conf
+                                      /etc/gssproxy/99-network-fs-clients.conf
+                                      /etc/gssproxy/gssproxy.conf
+gtk3                         3        /etc/
+                                      /etc/gtk-3.0/
+                                      /etc/gtk-3.0/im-multipress.conf
+i3lock-color                 3        /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/i3lock
+iana-etc                     3        /etc/
+                                      /etc/protocols
+                                      /etc/services
+imagemagick                  13       /etc/
+                                      /etc/ImageMagick-7/
+                                      /etc/ImageMagick-7/colors.xml
+                                      /etc/ImageMagick-7/delegates.xml
+                                      /etc/ImageMagick-7/log.xml
+                                      /etc/ImageMagick-7/mime.xml
+                                      /etc/ImageMagick-7/policy.xml
+                                      /etc/ImageMagick-7/quantization-table.xml
+                                      /etc/ImageMagick-7/thresholds.xml
+                                      /etc/ImageMagick-7/type-dejavu.xml
+                                      /etc/ImageMagick-7/type-ghostscript.xml
+                                      /etc/ImageMagick-7/type-urw-base35-type1.xml
+                                      /etc/ImageMagick-7/type.xml
+inetutils                    4        /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/rlogin
+                                      /etc/pam.d/rsh
+iptables                     9        /etc/
+                                      /etc/arptables.conf
+                                      /etc/ebtables.conf
+                                      /etc/ethertypes
+                                      /etc/iptables/
+                                      /etc/iptables/empty.rules
+                                      /etc/iptables/ip6tables.rules
+                                      /etc/iptables/iptables.rules
+                                      /etc/iptables/simple_firewall.rules
+iptraf-ng                    3        /etc/
+                                      /etc/logrotate.d/
+                                      /etc/logrotate.d/iptraf-ng-logrotate.conf
+kbd                          3        /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/vlock
+kdeconnect                   7        /etc/
+                                      /etc/ufw/
+                                      /etc/ufw/applications.d/
+                                      /etc/ufw/applications.d/kdeconnect
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/org.kde.kdeconnect.daemon.desktop
+keyutils                     4        /etc/
+                                      /etc/keyutils/
+                                      /etc/request-key.conf
+                                      /etc/request-key.d/
+kglobalacceld                4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/kglobalacceld.desktop
+kio5                         4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/accept-languages.codes
+                                      /etc/xdg/kshorturifilterrc
+kmod                         3        /etc/
+                                      /etc/depmod.d/
+                                      /etc/modprobe.d/
+krb5                         2        /etc/
+                                      /etc/krb5.conf
+kwallet-pam                  4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/pam_kwallet_init.desktop
+kxmlgui5                     4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/ui/
+                                      /etc/xdg/ui/ui_standards.rc
+lib32-glibc                  3        /etc/
+                                      /etc/ld.so.conf.d/
+                                      /etc/ld.so.conf.d/lib32-glibc.conf
+libblockdev                  5        /etc/
+                                      /etc/libblockdev/
+                                      /etc/libblockdev/3/
+                                      /etc/libblockdev/3/conf.d/
+                                      /etc/libblockdev/3/conf.d/00-default.cfg
+libcanberra                  5        /etc/
+                                      /etc/X11/
+                                      /etc/X11/xinit/
+                                      /etc/X11/xinit/xinitrc.d/
+                                      /etc/X11/xinit/xinitrc.d/40-libcanberra-gtk-module.sh
+libelf                       6        /etc/
+                                      /etc/debuginfod/
+                                      /etc/debuginfod/archlinux.urls
+                                      /etc/profile.d/
+                                      /etc/profile.d/debuginfod.csh
+                                      /etc/profile.d/debuginfod.sh
+libinput                     2        /etc/
+                                      /etc/libinput/
+libldap                      3        /etc/
+                                      /etc/openldap/
+                                      /etc/openldap/ldap.conf
+libnl                        4        /etc/
+                                      /etc/libnl/
+                                      /etc/libnl/classid
+                                      /etc/libnl/pktloc
+libpaper                     4        /etc/
+                                      /etc/libpaper.d/
+                                      /etc/papersize
+                                      /etc/paperspecs
+libpulse                     3        /etc/
+                                      /etc/pulse/
+                                      /etc/pulse/client.conf
+libpwquality                 4        /etc/
+                                      /etc/security/
+                                      /etc/security/pwquality.conf
+                                      /etc/security/pwquality.conf.d/
+libreoffice-fresh            8        /etc/
+                                      /etc/libreoffice/
+                                      /etc/libreoffice/bootstraprc
+                                      /etc/libreoffice/psprint.conf
+                                      /etc/libreoffice/sofficerc
+                                      /etc/profile.d/
+                                      /etc/profile.d/libreoffice-fresh.csh
+                                      /etc/profile.d/libreoffice-fresh.sh
+libtirpc                     3        /etc/
+                                      /etc/bindresvport.blacklist
+                                      /etc/netconfig
+libva                        2        /etc/
+                                      /etc/libva.conf
+libvdpau                     2        /etc/
+                                      /etc/vdpau_wrapper.cfg
+libvirt                      69       /etc/
+                                      /etc/libvirt/
+                                      /etc/libvirt/ch.conf
+                                      /etc/libvirt/libvirt-admin.conf
+                                      /etc/libvirt/libvirt.conf
+                                      /etc/libvirt/libvirtd.conf
+                                      /etc/libvirt/lxc.conf
+                                      /etc/libvirt/lxc/
+                                      /etc/libvirt/lxc/autostart/
+                                      /etc/libvirt/network.conf
+                                      /etc/libvirt/nwfilter/
+                                      /etc/libvirt/nwfilter/allow-arp.xml
+                                      /etc/libvirt/nwfilter/allow-dhcp-server.xml
+                                      /etc/libvirt/nwfilter/allow-dhcp.xml
+                                      /etc/libvirt/nwfilter/allow-dhcpv6-server.xml
+                                      /etc/libvirt/nwfilter/allow-dhcpv6.xml
+                                      /etc/libvirt/nwfilter/allow-incoming-ipv4.xml
+                                      /etc/libvirt/nwfilter/allow-incoming-ipv6.xml
+                                      /etc/libvirt/nwfilter/allow-ipv4.xml
+                                      /etc/libvirt/nwfilter/allow-ipv6.xml
+                                      /etc/libvirt/nwfilter/clean-traffic-gateway.xml
+                                      /etc/libvirt/nwfilter/clean-traffic.xml
+                                      /etc/libvirt/nwfilter/no-arp-ip-spoofing.xml
+                                      /etc/libvirt/nwfilter/no-arp-mac-spoofing.xml
+                                      /etc/libvirt/nwfilter/no-arp-spoofing.xml
+                                      /etc/libvirt/nwfilter/no-ip-multicast.xml
+                                      /etc/libvirt/nwfilter/no-ip-spoofing.xml
+                                      /etc/libvirt/nwfilter/no-ipv6-multicast.xml
+                                      /etc/libvirt/nwfilter/no-ipv6-spoofing.xml
+                                      /etc/libvirt/nwfilter/no-mac-broadcast.xml
+                                      /etc/libvirt/nwfilter/no-mac-spoofing.xml
+                                      /etc/libvirt/nwfilter/no-other-l2-traffic.xml
+                                      /etc/libvirt/nwfilter/no-other-rarp-traffic.xml
+                                      /etc/libvirt/nwfilter/qemu-announce-self-rarp.xml
+                                      /etc/libvirt/nwfilter/qemu-announce-self.xml
+                                      /etc/libvirt/qemu-lockd.conf
+                                      /etc/libvirt/qemu.conf
+                                      /etc/libvirt/qemu/
+                                      /etc/libvirt/qemu/autostart/
+                                      /etc/libvirt/qemu/networks/
+                                      /etc/libvirt/qemu/networks/autostart/
+                                      /etc/libvirt/qemu/networks/default.xml
+                                      /etc/libvirt/secret.conf
+                                      /etc/libvirt/secrets/
+                                      /etc/libvirt/storage/
+                                      /etc/libvirt/storage/autostart/
+                                      /etc/libvirt/virt-login-shell.conf
+                                      /etc/libvirt/virtchd.conf
+                                      /etc/libvirt/virtinterfaced.conf
+                                      /etc/libvirt/virtlockd.conf
+                                      /etc/libvirt/virtlogd.conf
+                                      /etc/libvirt/virtlxcd.conf
+                                      /etc/libvirt/virtnetworkd.conf
+                                      /etc/libvirt/virtnodedevd.conf
+                                      /etc/libvirt/virtnwfilterd.conf
+                                      /etc/libvirt/virtproxyd.conf
+                                      /etc/libvirt/virtqemud.conf
+                                      /etc/libvirt/virtsecretd.conf
+                                      /etc/libvirt/virtstoraged.conf
+                                      /etc/libvirt/virtvboxd.conf
+                                      /etc/logrotate.d/
+                                      /etc/logrotate.d/libvirtd
+                                      /etc/logrotate.d/libvirtd.lxc
+                                      /etc/logrotate.d/libvirtd.qemu
+                                      /etc/sasl2/
+                                      /etc/sasl2/libvirt.conf
+                                      /etc/ssh/
+                                      /etc/ssh/ssh_config.d/
+                                      /etc/ssh/ssh_config.d/30-libvirt-ssh-proxy.conf
+linux-atm                    3        /etc/
+                                      /etc/atmsigd.conf
+                                      /etc/hosts.atm
+lm_sensors                   6        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/sensord
+                                      /etc/healthd.conf
+                                      /etc/sensors.d/
+                                      /etc/sensors3.conf
+logrotate                    3        /etc/
+                                      /etc/logrotate.conf
+                                      /etc/logrotate.d/
+lsb-release                  2        /etc/
+                                      /etc/lsb-release
+lvm2                         15       /etc/
+                                      /etc/lvm/
+                                      /etc/lvm/archive/
+                                      /etc/lvm/backup/
+                                      /etc/lvm/lvm.conf
+                                      /etc/lvm/lvmlocal.conf
+                                      /etc/lvm/profile/
+                                      /etc/lvm/profile/cache-mq.profile
+                                      /etc/lvm/profile/cache-smq.profile
+                                      /etc/lvm/profile/command_profile_template.profile
+                                      /etc/lvm/profile/lvmdbusd.profile
+                                      /etc/lvm/profile/metadata_profile_template.profile
+                                      /etc/lvm/profile/thin-generic.profile
+                                      /etc/lvm/profile/thin-performance.profile
+                                      /etc/lvm/profile/vdo-small.profile
+lynis                        3        /etc/
+                                      /etc/lynis/
+                                      /etc/lynis/default.prf
+mailcap                      5        /etc/
+                                      /etc/mailcap
+                                      /etc/mime.types
+                                      /etc/nginx/
+                                      /etc/nginx/mime.types
+man-db                       2        /etc/
+                                      /etc/man_db.conf
+mc                           12       /etc/
+                                      /etc/mc/
+                                      /etc/mc/edit.indent.rc
+                                      /etc/mc/filehighlight.ini
+                                      /etc/mc/mc.default.keymap
+                                      /etc/mc/mc.emacs.keymap
+                                      /etc/mc/mc.ext.ini
+                                      /etc/mc/mc.keymap
+                                      /etc/mc/mc.menu
+                                      /etc/mc/mc.vim.keymap
+                                      /etc/mc/mcedit.menu
+                                      /etc/mc/sfs.ini
+mdadm                        2        /etc/
+                                      /etc/mdadm.conf
+mkinitcpio                   8        /etc/
+                                      /etc/initcpio/
+                                      /etc/initcpio/hooks/
+                                      /etc/initcpio/install/
+                                      /etc/initcpio/post/
+                                      /etc/mkinitcpio.conf
+                                      /etc/mkinitcpio.conf.d/
+                                      /etc/mkinitcpio.d/
+mkinitcpio-openswap          2        /etc/
+                                      /etc/openswap.conf
+modemmanager                 5        /etc/
+                                      /etc/ModemManager/
+                                      /etc/ModemManager/connection.d/
+                                      /etc/ModemManager/fcc-unlock.d/
+                                      /etc/ModemManager/modem-setup.d/
+mtools                       2        /etc/
+                                      /etc/mtools.conf
+nano                         2        /etc/
+                                      /etc/nanorc
+nbd                          3        /etc/
+                                      /etc/nbd-server/
+                                      /etc/nbd-server/config
+ndctl                        9        /etc/
+                                      /etc/daxctl.conf.d/
+                                      /etc/daxctl.conf.d/daxctl.example.conf
+                                      /etc/ndctl.conf.d/
+                                      /etc/ndctl.conf.d/monitor.conf
+                                      /etc/ndctl.conf.d/ndctl.conf
+                                      /etc/ndctl/
+                                      /etc/ndctl/keys/
+                                      /etc/ndctl/keys/keys.readme
+ndisc6                       4        /etc/
+                                      /etc/rdnssd/
+                                      /etc/rdnssd/merge-hook
+                                      /etc/rdnssd/resolvconf-hook
+neovim                       4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/nvim/
+                                      /etc/xdg/nvim/sysinit.vim
+network-manager-applet       4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/nm-applet.desktop
+networkmanager               11       /etc/
+                                      /etc/NetworkManager/
+                                      /etc/NetworkManager/NetworkManager.conf
+                                      /etc/NetworkManager/conf.d/
+                                      /etc/NetworkManager/dispatcher.d/
+                                      /etc/NetworkManager/dispatcher.d/no-wait.d/
+                                      /etc/NetworkManager/dispatcher.d/pre-down.d/
+                                      /etc/NetworkManager/dispatcher.d/pre-up.d/
+                                      /etc/NetworkManager/dnsmasq-shared.d/
+                                      /etc/NetworkManager/dnsmasq.d/
+                                      /etc/NetworkManager/system-connections/
+nfs-utils                    7        /etc/
+                                      /etc/exports
+                                      /etc/exports.d/
+                                      /etc/nfs.conf
+                                      /etc/nfsmount.conf
+                                      /etc/request-key.d/
+                                      /etc/request-key.d/id_resolver.conf
+nfsidmap                     2        /etc/
+                                      /etc/idmapd.conf
+nftables                     2        /etc/
+                                      /etc/nftables.conf
+nilfs-utils                  2        /etc/
+                                      /etc/nilfs_cleanerd.conf
+ntp                          2        /etc/
+                                      /etc/ntp.conf
+nvme-cli                     3        /etc/
+                                      /etc/nvme/
+                                      /etc/nvme/nvme-fabrics.conf.sample
+open-iscsi                   6        /etc/
+                                      /etc/iscsi/
+                                      /etc/iscsi/initiatorname.iscsi
+                                      /etc/iscsi/iscsid.conf
+                                      /etc/logrotate.d/
+                                      /etc/logrotate.d/iscsiuiolog
+open-isns                    5        /etc/
+                                      /etc/isns/
+                                      /etc/isns/isnsadm.conf
+                                      /etc/isns/isnsd.conf
+                                      /etc/isns/isnsdd.conf
+openssh                      10       /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/sshd
+                                      /etc/ssh/
+                                      /etc/ssh/moduli
+                                      /etc/ssh/ssh_config
+                                      /etc/ssh/ssh_config.d/
+                                      /etc/ssh/sshd_config
+                                      /etc/ssh/sshd_config.d/
+                                      /etc/ssh/sshd_config.d/99-archlinux.conf
+openssl                      12       /etc/
+                                      /etc/ssl/
+                                      /etc/ssl/certs/
+                                      /etc/ssl/ct_log_list.cnf
+                                      /etc/ssl/ct_log_list.cnf.dist
+                                      /etc/ssl/misc/
+                                      /etc/ssl/misc/CA.pl
+                                      /etc/ssl/misc/tsget
+                                      /etc/ssl/misc/tsget.pl
+                                      /etc/ssl/openssl.cnf
+                                      /etc/ssl/openssl.cnf.dist
+                                      /etc/ssl/private/
+ostree                       6        /etc/
+                                      /etc/grub.d/
+                                      /etc/grub.d/15_ostree
+                                      /etc/ostree-mkinitcpio.conf
+                                      /etc/ostree/
+                                      /etc/ostree/remotes.d/
+p11-kit                      3        /etc/
+                                      /etc/pkcs11/
+                                      /etc/pkcs11/pkcs11.conf.example
+packagekit                   11       /etc/
+                                      /etc/PackageKit/
+                                      /etc/PackageKit/CommandNotFound.conf
+                                      /etc/PackageKit/PackageKit.conf
+                                      /etc/PackageKit/Vendor.conf
+                                      /etc/PackageKit/alpm.d/
+                                      /etc/PackageKit/alpm.d/groups.list
+                                      /etc/PackageKit/alpm.d/pacman.conf
+                                      /etc/PackageKit/alpm.d/repos.list
+                                      /etc/profile.d/
+                                      /etc/profile.d/PackageKit.sh
+pacman                       7        /etc/
+                                      /etc/makepkg.conf
+                                      /etc/makepkg.conf.d/
+                                      /etc/makepkg.conf.d/fortran.conf
+                                      /etc/makepkg.conf.d/rust.conf
+                                      /etc/makepkg.d/
+                                      /etc/pacman.conf
+pacman-contrib               3        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/pacman-contrib
+pacman-mirrorlist            3        /etc/
+                                      /etc/pacman.d/
+                                      /etc/pacman.d/mirrorlist
+pam                          12       /etc/
+                                      /etc/environment
+                                      /etc/security/
+                                      /etc/security/access.conf
+                                      /etc/security/faillock.conf
+                                      /etc/security/group.conf
+                                      /etc/security/limits.conf
+                                      /etc/security/namespace.conf
+                                      /etc/security/namespace.init
+                                      /etc/security/pam_env.conf
+                                      /etc/security/pwhistory.conf
+                                      /etc/security/time.conf
+pambase                      8        /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/other
+                                      /etc/pam.d/system-auth
+                                      /etc/pam.d/system-local-login
+                                      /etc/pam.d/system-login
+                                      /etc/pam.d/system-remote-login
+                                      /etc/pam.d/system-services
+partimage                    5        /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/partimaged
+                                      /etc/partimaged/
+                                      /etc/partimaged/partimagedusers
+paru-git                     2        /etc/
+                                      /etc/paru.conf
+pcp                          481      /etc/
+                                      /etc/pcp.conf
+                                      /etc/pcp.env
+                                      /etc/pcp/
+                                      /etc/pcp/bpf/
+                                      /etc/pcp/bpf/bpf.conf
+                                      /etc/pcp/db2/
+                                      /etc/pcp/db2/db2.conf
+                                      /etc/pcp/derived/
+                                      /etc/pcp/derived/cpu-util.conf
+                                      /etc/pcp/derived/denki.conf
+                                      /etc/pcp/derived/iostat.conf
+                                      /etc/pcp/derived/mssql.conf
+                                      /etc/pcp/derived/openmetrics.conf
+                                      /etc/pcp/derived/proc.conf
+                                      /etc/pcp/discover/
+                                      /etc/pcp/discover/pcp-kube-pods.conf
+                                      /etc/pcp/dstat/
+                                      /etc/pcp/dstat/aio
+                                      /etc/pcp/dstat/amd-gpu
+                                      /etc/pcp/dstat/battery
+                                      /etc/pcp/dstat/cpu
+                                      /etc/pcp/dstat/disk
+                                      /etc/pcp/dstat/dm
+                                      /etc/pcp/dstat/entropy
+                                      /etc/pcp/dstat/freespace
+                                      /etc/pcp/dstat/fs
+                                      /etc/pcp/dstat/gpfs
+                                      /etc/pcp/dstat/int
+                                      /etc/pcp/dstat/io
+                                      /etc/pcp/dstat/ipc
+                                      /etc/pcp/dstat/load
+                                      /etc/pcp/dstat/locks
+                                      /etc/pcp/dstat/md
+                                      /etc/pcp/dstat/mem
+                                      /etc/pcp/dstat/memcache
+                                      /etc/pcp/dstat/mongodb
+                                      /etc/pcp/dstat/mysql
+                                      /etc/pcp/dstat/net
+                                      /etc/pcp/dstat/nfs
+                                      /etc/pcp/dstat/nvidia-gpu
+                                      /etc/pcp/dstat/page
+                                      /etc/pcp/dstat/part
+                                      /etc/pcp/dstat/postfix
+                                      /etc/pcp/dstat/proc
+                                      /etc/pcp/dstat/redis
+                                      /etc/pcp/dstat/rpc
+                                      /etc/pcp/dstat/sockets
+                                      /etc/pcp/dstat/swap
+                                      /etc/pcp/dstat/sys
+                                      /etc/pcp/dstat/tcp
+                                      /etc/pcp/dstat/topbio
+                                      /etc/pcp/dstat/topchildwait
+                                      /etc/pcp/dstat/topcpu
+                                      /etc/pcp/dstat/topio
+                                      /etc/pcp/dstat/topmem
+                                      /etc/pcp/dstat/utmp
+                                      /etc/pcp/dstat/vllm
+                                      /etc/pcp/dstat/vm
+                                      /etc/pcp/dstat/zfs
+                                      /etc/pcp/elasticsearch/
+                                      /etc/pcp/elasticsearch/elasticsearch.conf
+                                      /etc/pcp/haproxy/
+                                      /etc/pcp/haproxy/haproxy.conf
+                                      /etc/pcp/hdb/
+                                      /etc/pcp/hdb/hdb.conf
+                                      /etc/pcp/htop/
+                                      /etc/pcp/htop/columns/
+                                      /etc/pcp/htop/meters/
+                                      /etc/pcp/htop/screens/
+                                      /etc/pcp/indom.conf
+                                      /etc/pcp/kvm/
+                                      /etc/pcp/kvm/kvm.conf
+                                      /etc/pcp/labels.conf
+                                      /etc/pcp/labels/
+                                      /etc/pcp/labels/optional/
+                                      /etc/pcp/linux/
+                                      /etc/pcp/linux/interfaces.conf
+                                      /etc/pcp/linux/samplebandwidth.conf
+                                      /etc/pcp/local.conf
+                                      /etc/pcp/lustre/
+                                      /etc/pcp/lustre/lustre.conf
+                                      /etc/pcp/mounts/
+                                      /etc/pcp/mounts/mounts.conf
+                                      /etc/pcp/netcheck/
+                                      /etc/pcp/netcheck/netcheck.conf
+                                      /etc/pcp/nixl/
+                                      /etc/pcp/nixl/nixl.conf
+                                      /etc/pcp/opentelemetry/
+                                      /etc/pcp/oracle/
+                                      /etc/pcp/oracle/sample.conf
+                                      /etc/pcp/overhead/
+                                      /etc/pcp/overhead/conf.d/
+                                      /etc/pcp/overhead/conf.d/default.conf
+                                      /etc/pcp/overhead/examples/
+                                      /etc/pcp/overhead/examples/sample.conf
+                                      /etc/pcp/pipe.conf.d/
+                                      /etc/pcp/pipe/
+                                      /etc/pcp/pipe/sample.conf
+                                      /etc/pcp/pmafm/
+                                      /etc/pcp/pmafm/pcp
+                                      /etc/pcp/pmafm/pcp-gui
+                                      /etc/pcp/pmcd/
+                                      /etc/pcp/pmcd/pmcd.conf
+                                      /etc/pcp/pmcd/pmcd.options
+                                      /etc/pcp/pmcd/rc.local
+                                      /etc/pcp/pmcheck/
+                                      /etc/pcp/pmfind/
+                                      /etc/pcp/pmie/
+                                      /etc/pcp/pmie/class.d/
+                                      /etc/pcp/pmie/class.d/pmfind
+                                      /etc/pcp/pmie/control
+                                      /etc/pcp/pmie/control.d/
+                                      /etc/pcp/pmie/control.d/local
+                                      /etc/pcp/pmieconf/
+                                      /etc/pcp/pmieconf/cisco/
+                                      /etc/pcp/pmieconf/cisco/in_util
+                                      /etc/pcp/pmieconf/cisco/out_util
+                                      /etc/pcp/pmieconf/cpu/
+                                      /etc/pcp/pmieconf/cpu/context_switch
+                                      /etc/pcp/pmieconf/cpu/load_average
+                                      /etc/pcp/pmieconf/cpu/low_util
+                                      /etc/pcp/pmieconf/cpu/system
+                                      /etc/pcp/pmieconf/cpu/util
+                                      /etc/pcp/pmieconf/dm/
+                                      /etc/pcp/pmieconf/dm/data_high_util
+                                      /etc/pcp/pmieconf/dm/metadata_high_util
+                                      /etc/pcp/pmieconf/entropy/
+                                      /etc/pcp/pmieconf/entropy/available
+                                      /etc/pcp/pmieconf/filesys/
+                                      /etc/pcp/pmieconf/filesys/filling
+                                      /etc/pcp/pmieconf/filesys/vfs_files
+                                      /etc/pcp/pmieconf/global/
+                                      /etc/pcp/pmieconf/global/parameters
+                                      /etc/pcp/pmieconf/global/pcp_actions
+                                      /etc/pcp/pmieconf/memory/
+                                      /etc/pcp/pmieconf/memory/exhausted
+                                      /etc/pcp/pmieconf/memory/oom_kill
+                                      /etc/pcp/pmieconf/memory/swap_low
+                                      /etc/pcp/pmieconf/network/
+                                      /etc/pcp/pmieconf/network/tcplistenoverflows
+                                      /etc/pcp/pmieconf/network/tcpqfulldocookies
+                                      /etc/pcp/pmieconf/network/tcpqfulldrops
+                                      /etc/pcp/pmieconf/openvswitch/
+                                      /etc/pcp/pmieconf/openvswitch/errors
+                                      /etc/pcp/pmieconf/openvswitch/mtu_exceeded_drops
+                                      /etc/pcp/pmieconf/openvswitch/rx_drops
+                                      /etc/pcp/pmieconf/openvswitch/rx_qos_drops
+                                      /etc/pcp/pmieconf/openvswitch/tx_drops
+                                      /etc/pcp/pmieconf/openvswitch/tx_failure_drops
+                                      /etc/pcp/pmieconf/openvswitch/tx_qos_drops
+                                      /etc/pcp/pmieconf/openvswitch/tx_retries
+                                      /etc/pcp/pmieconf/openvswitch/vhost_notification
+                                      /etc/pcp/pmieconf/openvswitch/vhost_tx_contention
+                                      /etc/pcp/pmieconf/percpu/
+                                      /etc/pcp/pmieconf/percpu/many_util
+                                      /etc/pcp/pmieconf/percpu/some_util
+                                      /etc/pcp/pmieconf/percpu/system
+                                      /etc/pcp/pmieconf/perdisk/
+                                      /etc/pcp/pmieconf/perdisk/average_queue_length
+                                      /etc/pcp/pmieconf/perdisk/average_wait_time
+                                      /etc/pcp/pmieconf/perdisk/bandwidth
+                                      /etc/pcp/pmieconf/perdisk/iops
+                                      /etc/pcp/pmieconf/pernetif/
+                                      /etc/pcp/pmieconf/pernetif/collisions
+                                      /etc/pcp/pmieconf/pernetif/errors
+                                      /etc/pcp/pmieconf/pernetif/packets
+                                      /etc/pcp/pmieconf/pernetif/util
+                                      /etc/pcp/pmieconf/power/
+                                      /etc/pcp/pmieconf/power/thermal_throttle
+                                      /etc/pcp/pmieconf/primary/
+                                      /etc/pcp/pmieconf/primary/pmda_status
+                                      /etc/pcp/pmieconf/shping/
+                                      /etc/pcp/pmieconf/shping/response
+                                      /etc/pcp/pmieconf/shping/status
+                                      /etc/pcp/pmieconf/testing/
+                                      /etc/pcp/pmieconf/testing/test_actions
+                                      /etc/pcp/pmieconf/zeroconf/
+                                      /etc/pcp/pmieconf/zeroconf/all_threads
+                                      /etc/pcp/pmlogcompress/
+                                      /etc/pcp/pmlogcompress/defaults
+                                      /etc/pcp/pmlogconf/
+                                      /etc/pcp/pmlogconf/apache/
+                                      /etc/pcp/pmlogconf/apache/processes
+                                      /etc/pcp/pmlogconf/apache/summary
+                                      /etc/pcp/pmlogconf/apache/uptime
+                                      /etc/pcp/pmlogconf/cpu/
+                                      /etc/pcp/pmlogconf/cpu/percpu
+                                      /etc/pcp/pmlogconf/cpu/summary
+                                      /etc/pcp/pmlogconf/db2/
+                                      /etc/pcp/pmlogconf/db2/default
+                                      /etc/pcp/pmlogconf/db2/summary
+                                      /etc/pcp/pmlogconf/disk/
+                                      /etc/pcp/pmlogconf/disk/percontroller
+                                      /etc/pcp/pmlogconf/disk/perdisk
+                                      /etc/pcp/pmlogconf/disk/perpartition
+                                      /etc/pcp/pmlogconf/disk/summary
+                                      /etc/pcp/pmlogconf/elasticsearch/
+                                      /etc/pcp/pmlogconf/elasticsearch/summary
+                                      /etc/pcp/pmlogconf/filesystem/
+                                      /etc/pcp/pmlogconf/filesystem/all
+                                      /etc/pcp/pmlogconf/filesystem/rpc-server
+                                      /etc/pcp/pmlogconf/filesystem/summary
+                                      /etc/pcp/pmlogconf/filesystem/xfs-all
+                                      /etc/pcp/pmlogconf/filesystem/xfs-io-linux
+                                      /etc/pcp/pmlogconf/gfs2/
+                                      /etc/pcp/pmlogconf/gfs2/gfs2-all
+                                      /etc/pcp/pmlogconf/gfs2/gfs2-base
+                                      /etc/pcp/pmlogconf/kernel/
+                                      /etc/pcp/pmlogconf/kernel/bufcache-activity
+                                      /etc/pcp/pmlogconf/kernel/bufcache-all
+                                      /etc/pcp/pmlogconf/kernel/inode-cache
+                                      /etc/pcp/pmlogconf/kernel/load
+                                      /etc/pcp/pmlogconf/kernel/memory-linux
+                                      /etc/pcp/pmlogconf/kernel/read-write-data
+                                      /etc/pcp/pmlogconf/kernel/summary-linux
+                                      /etc/pcp/pmlogconf/kernel/summary-windows
+                                      /etc/pcp/pmlogconf/kernel/syscalls-linux
+                                      /etc/pcp/pmlogconf/kernel/vnodes
+                                      /etc/pcp/pmlogconf/kvm/
+                                      /etc/pcp/pmlogconf/kvm/kvm
+                                      /etc/pcp/pmlogconf/libvirt/
+                                      /etc/pcp/pmlogconf/libvirt/libvirt
+                                      /etc/pcp/pmlogconf/mailq/
+                                      /etc/pcp/pmlogconf/mailq/summary
+                                      /etc/pcp/pmlogconf/memcache/
+                                      /etc/pcp/pmlogconf/memcache/summary
+                                      /etc/pcp/pmlogconf/memory/
+                                      /etc/pcp/pmlogconf/memory/buddyinfo
+                                      /etc/pcp/pmlogconf/memory/ksminfo
+                                      /etc/pcp/pmlogconf/memory/meminfo
+                                      /etc/pcp/pmlogconf/memory/proc-linux
+                                      /etc/pcp/pmlogconf/memory/slabinfo
+                                      /etc/pcp/pmlogconf/memory/swap-activity
+                                      /etc/pcp/pmlogconf/memory/swap-all
+                                      /etc/pcp/pmlogconf/memory/swap-config
+                                      /etc/pcp/pmlogconf/memory/vmstat
+                                      /etc/pcp/pmlogconf/memory/zoneinfo
+                                      /etc/pcp/pmlogconf/mmv/
+                                      /etc/pcp/pmlogconf/mmv/summary
+                                      /etc/pcp/pmlogconf/mysql/
+                                      /etc/pcp/pmlogconf/mysql/summary
+                                      /etc/pcp/pmlogconf/netcheck/
+                                      /etc/pcp/pmlogconf/netcheck/summary
+                                      /etc/pcp/pmlogconf/netfilter/
+                                      /etc/pcp/pmlogconf/netfilter/config
+                                      /etc/pcp/pmlogconf/netfilter/summary
+                                      /etc/pcp/pmlogconf/networking/
+                                      /etc/pcp/pmlogconf/networking/icmp6
+                                      /etc/pcp/pmlogconf/networking/interface-all
+                                      /etc/pcp/pmlogconf/networking/interface-summary
+                                      /etc/pcp/pmlogconf/networking/ip6
+                                      /etc/pcp/pmlogconf/networking/mbufs
+                                      /etc/pcp/pmlogconf/networking/multicast
+                                      /etc/pcp/pmlogconf/networking/nfs2-client
+                                      /etc/pcp/pmlogconf/networking/nfs2-server
+                                      /etc/pcp/pmlogconf/networking/nfs3-client
+                                      /etc/pcp/pmlogconf/networking/nfs3-server
+                                      /etc/pcp/pmlogconf/networking/nfs4-client
+                                      /etc/pcp/pmlogconf/networking/nfs4-server
+                                      /etc/pcp/pmlogconf/networking/other-protocols
+                                      /etc/pcp/pmlogconf/networking/perprocess-linux
+                                      /etc/pcp/pmlogconf/networking/persocket-linux
+                                      /etc/pcp/pmlogconf/networking/rpc
+                                      /etc/pcp/pmlogconf/networking/socket-linux
+                                      /etc/pcp/pmlogconf/networking/softnet
+                                      /etc/pcp/pmlogconf/networking/streams
+                                      /etc/pcp/pmlogconf/networking/tcp-activity-linux
+                                      /etc/pcp/pmlogconf/networking/tcp-all
+                                      /etc/pcp/pmlogconf/networking/udp-all
+                                      /etc/pcp/pmlogconf/networking/udp-packets-linux
+                                      /etc/pcp/pmlogconf/networking/udp6
+                                      /etc/pcp/pmlogconf/nginx/
+                                      /etc/pcp/pmlogconf/nginx/summary
+                                      /etc/pcp/pmlogconf/nvidia/
+                                      /etc/pcp/pmlogconf/nvidia/config
+                                      /etc/pcp/pmlogconf/nvidia/summary
+                                      /etc/pcp/pmlogconf/openmetrics/
+                                      /etc/pcp/pmlogconf/openmetrics/kepler
+                                      /etc/pcp/pmlogconf/openmetrics/summary
+                                      /etc/pcp/pmlogconf/openmetrics/vllm
+                                      /etc/pcp/pmlogconf/opentelemetry/
+                                      /etc/pcp/pmlogconf/opentelemetry/summary
+                                      /etc/pcp/pmlogconf/openvswitch/
+                                      /etc/pcp/pmlogconf/openvswitch/summary
+                                      /etc/pcp/pmlogconf/oracle/
+                                      /etc/pcp/pmlogconf/oracle/summary
+                                      /etc/pcp/pmlogconf/platform/
+                                      /etc/pcp/pmlogconf/platform/hinv
+                                      /etc/pcp/pmlogconf/platform/linux
+                                      /etc/pcp/pmlogconf/postgresql/
+                                      /etc/pcp/pmlogconf/postgresql/summary
+                                      /etc/pcp/pmlogconf/rabbitmq/
+                                      /etc/pcp/pmlogconf/rabbitmq/summary
+                                      /etc/pcp/pmlogconf/rsyslog/
+                                      /etc/pcp/pmlogconf/rsyslog/summary
+                                      /etc/pcp/pmlogconf/services/
+                                      /etc/pcp/pmlogconf/services/pmproxy
+                                      /etc/pcp/pmlogconf/services/redis
+                                      /etc/pcp/pmlogconf/shping/
+                                      /etc/pcp/pmlogconf/shping/summary
+                                      /etc/pcp/pmlogconf/sqlserver/
+                                      /etc/pcp/pmlogconf/sqlserver/summary
+                                      /etc/pcp/pmlogconf/statsd/
+                                      /etc/pcp/pmlogconf/statsd/statsd
+                                      /etc/pcp/pmlogconf/storage/
+                                      /etc/pcp/pmlogconf/storage/cifs
+                                      /etc/pcp/pmlogconf/storage/farm-ata
+                                      /etc/pcp/pmlogconf/storage/farm-scsi
+                                      /etc/pcp/pmlogconf/storage/smart
+                                      /etc/pcp/pmlogconf/storage/vdo
+                                      /etc/pcp/pmlogconf/storage/vdo-summary
+                                      /etc/pcp/pmlogconf/tools/
+                                      /etc/pcp/pmlogconf/tools/atop
+                                      /etc/pcp/pmlogconf/tools/atop-gpustats
+                                      /etc/pcp/pmlogconf/tools/atop-hotproc
+                                      /etc/pcp/pmlogconf/tools/atop-httpstats
+                                      /etc/pcp/pmlogconf/tools/atop-infiniband
+                                      /etc/pcp/pmlogconf/tools/atop-nfsclient
+                                      /etc/pcp/pmlogconf/tools/atop-perfevent
+                                      /etc/pcp/pmlogconf/tools/atop-proc
+                                      /etc/pcp/pmlogconf/tools/atop-summary
+                                      /etc/pcp/pmlogconf/tools/atop-zfs
+                                      /etc/pcp/pmlogconf/tools/atop-zswap
+                                      /etc/pcp/pmlogconf/tools/collectl
+                                      /etc/pcp/pmlogconf/tools/collectl-interrupts
+                                      /etc/pcp/pmlogconf/tools/collectl-summary
+                                      /etc/pcp/pmlogconf/tools/dmcache
+                                      /etc/pcp/pmlogconf/tools/dstat
+                                      /etc/pcp/pmlogconf/tools/dstat-summary
+                                      /etc/pcp/pmlogconf/tools/free
+                                      /etc/pcp/pmlogconf/tools/free-summary
+                                      /etc/pcp/pmlogconf/tools/hotproc
+                                      /etc/pcp/pmlogconf/tools/htop
+                                      /etc/pcp/pmlogconf/tools/htop-proc
+                                      /etc/pcp/pmlogconf/tools/htop-summary
+                                      /etc/pcp/pmlogconf/tools/htop-zfs
+                                      /etc/pcp/pmlogconf/tools/iostat
+                                      /etc/pcp/pmlogconf/tools/ip
+                                      /etc/pcp/pmlogconf/tools/ipcs
+                                      /etc/pcp/pmlogconf/tools/mpstat
+                                      /etc/pcp/pmlogconf/tools/mpstat-interrupts
+                                      /etc/pcp/pmlogconf/tools/mpstat-summary
+                                      /etc/pcp/pmlogconf/tools/numastat
+                                      /etc/pcp/pmlogconf/tools/pcp-summary
+                                      /etc/pcp/pmlogconf/tools/pidstat
+                                      /etc/pcp/pmlogconf/tools/pidstat-summary
+                                      /etc/pcp/pmlogconf/tools/pmclient
+                                      /etc/pcp/pmlogconf/tools/pmclient-summary
+                                      /etc/pcp/pmlogconf/tools/pmieconf
+                                      /etc/pcp/pmlogconf/tools/pmstat
+                                      /etc/pcp/pmlogconf/tools/sar
+                                      /etc/pcp/pmlogconf/tools/sar-summary
+                                      /etc/pcp/pmlogconf/tools/tapestat
+                                      /etc/pcp/pmlogconf/tools/uptime
+                                      /etc/pcp/pmlogconf/tools/vector
+                                      /etc/pcp/pmlogconf/tools/vector-summary
+                                      /etc/pcp/pmlogconf/tools/vmstat
+                                      /etc/pcp/pmlogconf/tools/vmstat-summary
+                                      /etc/pcp/pmlogconf/uwsgi/
+                                      /etc/pcp/pmlogconf/uwsgi/summary
+                                      /etc/pcp/pmlogconf/zeroconf/
+                                      /etc/pcp/pmlogconf/zeroconf/atop-proc
+                                      /etc/pcp/pmlogconf/zeroconf/disk
+                                      /etc/pcp/pmlogconf/zeroconf/filesystem
+                                      /etc/pcp/pmlogconf/zeroconf/hugepages
+                                      /etc/pcp/pmlogconf/zeroconf/hv-balloon
+                                      /etc/pcp/pmlogconf/zeroconf/hv-balloon-summary
+                                      /etc/pcp/pmlogconf/zeroconf/interrupts
+                                      /etc/pcp/pmlogconf/zeroconf/nfsclient
+                                      /etc/pcp/pmlogconf/zeroconf/numa
+                                      /etc/pcp/pmlogconf/zeroconf/numahugepages
+                                      /etc/pcp/pmlogconf/zeroconf/numastat
+                                      /etc/pcp/pmlogconf/zeroconf/pidstat
+                                      /etc/pcp/pmlogconf/zeroconf/pidstat-summary
+                                      /etc/pcp/pmlogconf/zeroconf/rpc
+                                      /etc/pcp/pmlogconf/zeroconf/tapestat
+                                      /etc/pcp/pmlogconf/zeroconf/tty
+                                      /etc/pcp/pmlogconf/zeroconf/vmmemctl
+                                      /etc/pcp/pmlogconf/zeroconf/xfs-perdev
+                                      /etc/pcp/pmlogconf/zimbra/
+                                      /etc/pcp/pmlogconf/zimbra/all
+                                      /etc/pcp/pmlogger/
+                                      /etc/pcp/pmlogger/class.d/
+                                      /etc/pcp/pmlogger/class.d/logpush
+                                      /etc/pcp/pmlogger/class.d/pmfind
+                                      /etc/pcp/pmlogger/config.pmstat
+                                      /etc/pcp/pmlogger/control
+                                      /etc/pcp/pmlogger/control.d/
+                                      /etc/pcp/pmlogger/control.d/local
+                                      /etc/pcp/pmlogger/options.pmstat
+                                      /etc/pcp/pmlogredact/
+                                      /etc/pcp/pmlogredact/network
+                                      /etc/pcp/pmlogredact/usernames
+                                      /etc/pcp/pmlogrewrite/
+                                      /etc/pcp/pmlogrewrite/amdgpu.conf
+                                      /etc/pcp/pmlogrewrite/bind2.conf
+                                      /etc/pcp/pmlogrewrite/cgroup_units.conf
+                                      /etc/pcp/pmlogrewrite/jbd2_kernel_ulong.conf
+                                      /etc/pcp/pmlogrewrite/kvm_fixups.conf
+                                      /etc/pcp/pmlogrewrite/linux_disk_all_fixups.conf
+                                      /etc/pcp/pmlogrewrite/linux_kernel_fixups.conf
+                                      /etc/pcp/pmlogrewrite/linux_kernel_ulong.conf
+                                      /etc/pcp/pmlogrewrite/linux_mem_fixups.conf
+                                      /etc/pcp/pmlogrewrite/linux_proc_fs_nfsd_fixups.conf
+                                      /etc/pcp/pmlogrewrite/linux_proc_migrate.conf
+                                      /etc/pcp/pmlogrewrite/linux_proc_net_snmp_migrate.conf
+                                      /etc/pcp/pmlogrewrite/linux_proc_net_tcp_migrate.conf
+                                      /etc/pcp/pmlogrewrite/linux_xfs_migrate.conf
+                                      /etc/pcp/pmlogrewrite/linux_xfs_perdev_buffer.conf
+                                      /etc/pcp/pmlogrewrite/mmv_migrate.conf
+                                      /etc/pcp/pmlogrewrite/mysql_migrate.conf
+                                      /etc/pcp/pmlogrewrite/nfsclient_migrate.conf
+                                      /etc/pcp/pmlogrewrite/nvidia.conf
+                                      /etc/pcp/pmlogrewrite/pmcd_migrate.conf
+                                      /etc/pcp/pmlogrewrite/pmproxy_fixups.conf
+                                      /etc/pcp/pmlogrewrite/proc_discrete_strings.conf
+                                      /etc/pcp/pmlogrewrite/proc_jiffies.conf
+                                      /etc/pcp/pmlogrewrite/proc_kernel_ulong.conf
+                                      /etc/pcp/pmlogrewrite/proc_kernel_ulong_migrate.conf
+                                      /etc/pcp/pmlogrewrite/proc_scheduler.conf
+                                      /etc/pcp/pmlogrewrite/sample_migrate.conf
+                                      /etc/pcp/pmlogrewrite/shping_migrate.conf
+                                      /etc/pcp/pmproxy/
+                                      /etc/pcp/pmproxy/pmproxy.conf
+                                      /etc/pcp/pmproxy/pmproxy.options
+                                      /etc/pcp/pmrep/
+                                      /etc/pcp/pmrep/00-defaults.conf
+                                      /etc/pcp/pmrep/collectl.conf
+                                      /etc/pcp/pmrep/iostat.conf
+                                      /etc/pcp/pmrep/iostat_v10.conf
+                                      /etc/pcp/pmrep/iostat_v11.conf
+                                      /etc/pcp/pmrep/iostat_v12_5.conf
+                                      /etc/pcp/pmrep/macstat.conf
+                                      /etc/pcp/pmrep/mpstat.conf
+                                      /etc/pcp/pmrep/numa.conf
+                                      /etc/pcp/pmrep/pidstat.conf
+                                      /etc/pcp/pmrep/pmproxy.conf
+                                      /etc/pcp/pmrep/pmstat.conf
+                                      /etc/pcp/pmrep/proc.conf
+                                      /etc/pcp/pmrep/sar.conf
+                                      /etc/pcp/pmrep/sar_v11.conf
+                                      /etc/pcp/pmrep/vmstat.conf
+                                      /etc/pcp/pmsearch/
+                                      /etc/pcp/pmsearch/pmsearch.conf
+                                      /etc/pcp/pmseries/
+                                      /etc/pcp/pmseries/pmseries.conf
+                                      /etc/pcp/proc/
+                                      /etc/pcp/proc/access.conf
+                                      /etc/pcp/proc/samplehotproc.conf
+                                      /etc/pcp/rabbitmq/
+                                      /etc/pcp/rabbitmq/rabbitmq.conf
+                                      /etc/pcp/redis/
+                                      /etc/pcp/redis/redis.conf
+                                      /etc/pcp/shping/
+                                      /etc/pcp/shping/sample.conf
+                                      /etc/pcp/simple/
+                                      /etc/pcp/simple/simple.conf
+                                      /etc/pcp/sockets/
+                                      /etc/pcp/sockets/filter.conf
+                                      /etc/pcp/summary/
+                                      /etc/pcp/summary/expr.pmie
+                                      /etc/pcp/tls.conf
+                                      /etc/pcp/uwsgi/
+                                      /etc/pcp/uwsgi/uwsgi.conf
+                                      /etc/pcp/valkey/
+                                      /etc/pcp/valkey/valkey.conf
+                                      /etc/sasl2/
+                                      /etc/sasl2/pmcd.conf
+                                      /etc/sysconfig/
+                                      /etc/sysconfig/pmcd
+                                      /etc/sysconfig/pmfind
+                                      /etc/sysconfig/pmie_timers
+                                      /etc/sysconfig/pmlogger
+                                      /etc/sysconfig/pmlogger_farm
+                                      /etc/sysconfig/pmlogger_timers
+                                      /etc/sysconfig/pmproxy
+                                      /etc/sysconfig/pmproxy_timers
+                                      /etc/zabbix/
+                                      /etc/zabbix/zabbix_agentd.d/
+                                      /etc/zabbix/zabbix_agentd.d/zbxpcp.conf
+pcsclite                     3        /etc/
+                                      /etc/default/
+                                      /etc/default/pcscd
+perl                         4        /etc/
+                                      /etc/profile.d/
+                                      /etc/profile.d/perlbin.csh
+                                      /etc/profile.d/perlbin.sh
+phodav                       3        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/spice-webdavd
+pipewire                     6        /etc/
+                                      /etc/pipewire/
+                                      /etc/pipewire/client-rt.conf.d/
+                                      /etc/pipewire/client.conf.d/
+                                      /etc/pipewire/minimal.conf.d/
+                                      /etc/pipewire/pipewire.conf.d/
+pipewire-alsa                4        /etc/
+                                      /etc/alsa/
+                                      /etc/alsa/conf.d/
+                                      /etc/alsa/conf.d/99-pipewire-default.conf
+pipewire-audio               4        /etc/
+                                      /etc/alsa/
+                                      /etc/alsa/conf.d/
+                                      /etc/alsa/conf.d/50-pipewire.conf
+pipewire-jack                3        /etc/
+                                      /etc/pipewire/
+                                      /etc/pipewire/jack.conf.d/
+pipewire-pulse               3        /etc/
+                                      /etc/pipewire/
+                                      /etc/pipewire/pipewire-pulse.conf.d/
+plasma-desktop               4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/kaccess.desktop
+plasma-workspace             10       /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/gmenudbusmenuproxy.desktop
+                                      /etc/xdg/autostart/org.kde.plasma-fallback-session-restore.desktop
+                                      /etc/xdg/autostart/org.kde.plasmashell.desktop
+                                      /etc/xdg/autostart/xembedsniproxy.desktop
+                                      /etc/xdg/menus/
+                                      /etc/xdg/menus/plasma-applications.menu
+                                      /etc/xdg/plasmanotifyrc
+plocate                      2        /etc/
+                                      /etc/updatedb.conf
+plymouth                     5        /etc/
+                                      /etc/logrotate.d/
+                                      /etc/logrotate.d/bootlog
+                                      /etc/plymouth/
+                                      /etc/plymouth/plymouthd.conf
+polkit                       3        /etc/
+                                      /etc/polkit-1/
+                                      /etc/polkit-1/rules.d/
+polkit-kde-agent             4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/polkit-kde-authentication-agent-1.desktop
+powerdevil                   4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/powerdevil.desktop
+ppp                          21       /etc/
+                                      /etc/ppp/
+                                      /etc/ppp/chap-secrets.example
+                                      /etc/ppp/eaptls-client.example
+                                      /etc/ppp/eaptls-server.example
+                                      /etc/ppp/ip-down
+                                      /etc/ppp/ip-down.d/
+                                      /etc/ppp/ip-down.d/00-dns.sh
+                                      /etc/ppp/ip-up
+                                      /etc/ppp/ip-up.d/
+                                      /etc/ppp/ip-up.d/00-dns.sh
+                                      /etc/ppp/ipv6-down
+                                      /etc/ppp/ipv6-down.d/
+                                      /etc/ppp/ipv6-up
+                                      /etc/ppp/ipv6-up.d/
+                                      /etc/ppp/ipv6-up.d/00-iface-config.sh
+                                      /etc/ppp/openssl.cnf.example
+                                      /etc/ppp/options
+                                      /etc/ppp/options.example
+                                      /etc/ppp/pap-secrets.example
+                                      /etc/ppp/peers/
+pptpclient                   3        /etc/
+                                      /etc/ppp/
+                                      /etc/ppp/options.pptp
+pulseaudio-alsa              4        /etc/
+                                      /etc/alsa/
+                                      /etc/alsa/conf.d/
+                                      /etc/alsa/conf.d/99-pulseaudio-default.conf
+qemu-common                  5        /etc/
+                                      /etc/qemu/
+                                      /etc/qemu/bridge.conf
+                                      /etc/sasl2/
+                                      /etc/sasl2/qemu.conf
+rdma-core                    36       /etc/
+                                      /etc/infiniband-diags/
+                                      /etc/infiniband-diags/error_thresholds
+                                      /etc/infiniband-diags/ibdiag.conf
+                                      /etc/iwpmd.conf
+                                      /etc/libibverbs.d/
+                                      /etc/libibverbs.d/bnxt_re.driver
+                                      /etc/libibverbs.d/cxgb4.driver
+                                      /etc/libibverbs.d/efa.driver
+                                      /etc/libibverbs.d/erdma.driver
+                                      /etc/libibverbs.d/hfi1verbs.driver
+                                      /etc/libibverbs.d/hns.driver
+                                      /etc/libibverbs.d/ionic.driver
+                                      /etc/libibverbs.d/ipathverbs.driver
+                                      /etc/libibverbs.d/irdma.driver
+                                      /etc/libibverbs.d/mana.driver
+                                      /etc/libibverbs.d/mlx4.driver
+                                      /etc/libibverbs.d/mlx5.driver
+                                      /etc/libibverbs.d/mthca.driver
+                                      /etc/libibverbs.d/ocrdma.driver
+                                      /etc/libibverbs.d/qedr.driver
+                                      /etc/libibverbs.d/rxe.driver
+                                      /etc/libibverbs.d/siw.driver
+                                      /etc/libibverbs.d/vmw_pvrdma.driver
+                                      /etc/rdma/
+                                      /etc/rdma/mlx4.conf
+                                      /etc/rdma/modules/
+                                      /etc/rdma/modules/infiniband.conf
+                                      /etc/rdma/modules/iwarp.conf
+                                      /etc/rdma/modules/iwpmd.conf
+                                      /etc/rdma/modules/opa.conf
+                                      /etc/rdma/modules/rdma.conf
+                                      /etc/rdma/modules/roce.conf
+                                      /etc/rdma/modules/srp_daemon.conf
+                                      /etc/rdma/rdma.conf
+                                      /etc/srp_daemon.conf
+readline                     2        /etc/
+                                      /etc/inputrc
+refind                       3        /etc/
+                                      /etc/refind.d/
+                                      /etc/refind.d/keys/
+reflector                    4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/reflector/
+                                      /etc/xdg/reflector/reflector.conf
+rhash                        2        /etc/
+                                      /etc/rhashrc
+rp-pppoe                     3        /etc/
+                                      /etc/ppp/
+                                      /etc/ppp/pppoe-server-options
+rpcbind                      3        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/rpcbind
+rsync                        2        /etc/
+                                      /etc/rsyncd.conf
+rtl8821cu-morrownr-dkms-git  3        /etc/
+                                      /etc/modprobe.d/
+                                      /etc/modprobe.d/8821cu.conf
+samba                        9        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/samba
+                                      /etc/logrotate.d/
+                                      /etc/logrotate.d/samba
+                                      /etc/pam.d/
+                                      /etc/pam.d/samba
+                                      /etc/samba/
+                                      /etc/samba/private/
+sane                         86       /etc/
+                                      /etc/sane.d/
+                                      /etc/sane.d/abaton.conf
+                                      /etc/sane.d/agfafocus.conf
+                                      /etc/sane.d/apple.conf
+                                      /etc/sane.d/artec.conf
+                                      /etc/sane.d/artec_eplus48u.conf
+                                      /etc/sane.d/avision.conf
+                                      /etc/sane.d/bh.conf
+                                      /etc/sane.d/canon.conf
+                                      /etc/sane.d/canon630u.conf
+                                      /etc/sane.d/canon_dr.conf
+                                      /etc/sane.d/canon_lide70.conf
+                                      /etc/sane.d/canon_pp.conf
+                                      /etc/sane.d/cardscan.conf
+                                      /etc/sane.d/coolscan.conf
+                                      /etc/sane.d/coolscan2.conf
+                                      /etc/sane.d/coolscan3.conf
+                                      /etc/sane.d/dc210.conf
+                                      /etc/sane.d/dc240.conf
+                                      /etc/sane.d/dc25.conf
+                                      /etc/sane.d/dell1600n_net.conf
+                                      /etc/sane.d/dll.conf
+                                      /etc/sane.d/dll.d/
+                                      /etc/sane.d/dmc.conf
+                                      /etc/sane.d/epjitsu.conf
+                                      /etc/sane.d/epson.conf
+                                      /etc/sane.d/epson2.conf
+                                      /etc/sane.d/epsonds.conf
+                                      /etc/sane.d/escl.conf
+                                      /etc/sane.d/fujitsu.conf
+                                      /etc/sane.d/genesys.conf
+                                      /etc/sane.d/gphoto2.conf
+                                      /etc/sane.d/gt68xx.conf
+                                      /etc/sane.d/hp.conf
+                                      /etc/sane.d/hp3900.conf
+                                      /etc/sane.d/hp4200.conf
+                                      /etc/sane.d/hp5400.conf
+                                      /etc/sane.d/hpsj5s.conf
+                                      /etc/sane.d/hs2p.conf
+                                      /etc/sane.d/ibm.conf
+                                      /etc/sane.d/kodak.conf
+                                      /etc/sane.d/kodakaio.conf
+                                      /etc/sane.d/kvs1025.conf
+                                      /etc/sane.d/leo.conf
+                                      /etc/sane.d/lexmark.conf
+                                      /etc/sane.d/lexmark_x2600.conf
+                                      /etc/sane.d/ma1509.conf
+                                      /etc/sane.d/magicolor.conf
+                                      /etc/sane.d/matsushita.conf
+                                      /etc/sane.d/microtek.conf
+                                      /etc/sane.d/microtek2.conf
+                                      /etc/sane.d/mustek.conf
+                                      /etc/sane.d/mustek_pp.conf
+                                      /etc/sane.d/mustek_usb.conf
+                                      /etc/sane.d/nec.conf
+                                      /etc/sane.d/net.conf
+                                      /etc/sane.d/p5.conf
+                                      /etc/sane.d/pie.conf
+                                      /etc/sane.d/pieusb.conf
+                                      /etc/sane.d/pixma.conf
+                                      /etc/sane.d/plustek.conf
+                                      /etc/sane.d/plustek_pp.conf
+                                      /etc/sane.d/qcam.conf
+                                      /etc/sane.d/ricoh.conf
+                                      /etc/sane.d/rts8891.conf
+                                      /etc/sane.d/s9036.conf
+                                      /etc/sane.d/saned.conf
+                                      /etc/sane.d/sceptre.conf
+                                      /etc/sane.d/sharp.conf
+                                      /etc/sane.d/sm3840.conf
+                                      /etc/sane.d/snapscan.conf
+                                      /etc/sane.d/sp15c.conf
+                                      /etc/sane.d/st400.conf
+                                      /etc/sane.d/stv680.conf
+                                      /etc/sane.d/tamarack.conf
+                                      /etc/sane.d/teco1.conf
+                                      /etc/sane.d/teco2.conf
+                                      /etc/sane.d/teco3.conf
+                                      /etc/sane.d/test.conf
+                                      /etc/sane.d/u12.conf
+                                      /etc/sane.d/umax.conf
+                                      /etc/sane.d/umax1220u.conf
+                                      /etc/sane.d/umax_pp.conf
+                                      /etc/sane.d/v4l.conf
+                                      /etc/sane.d/xerox_mfp.conf
+screen                       6        /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/screen
+                                      /etc/screenrc
+                                      /etc/skel/
+                                      /etc/skel/.screenrc
+sddm                         5        /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/sddm
+                                      /etc/pam.d/sddm-autologin
+                                      /etc/pam.d/sddm-greeter
+shadow                       8        /etc/
+                                      /etc/default/
+                                      /etc/default/useradd
+                                      /etc/login.defs
+                                      /etc/pam.d/
+                                      /etc/pam.d/chpasswd
+                                      /etc/pam.d/newusers
+                                      /etc/pam.d/passwd
+signond                      2        /etc/
+                                      /etc/signond.conf
+slang                        2        /etc/
+                                      /etc/slsh.rc
+smartmontools                4        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/smartd
+                                      /etc/smartd.conf
+sndio                        3        /etc/
+                                      /etc/default/
+                                      /etc/default/sndiod
+spice-vdagent                6        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/spice-vdagentd
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/spice-vdagent.desktop
+sudo                         7        /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/sudo
+                                      /etc/sudo.conf
+                                      /etc/sudo_logsrvd.conf
+                                      /etc/sudoers
+                                      /etc/sudoers.d/
+swtpm                        4        /etc/
+                                      /etc/swtpm-localca.conf
+                                      /etc/swtpm-localca.options
+                                      /etc/swtpm_setup.conf
+syncthing                    4        /etc/
+                                      /etc/ufw/
+                                      /etc/ufw/applications.d/
+                                      /etc/ufw/applications.d/ufw-syncthing
+system-config-printer        6        /etc/
+                                      /etc/cupshelpers/
+                                      /etc/cupshelpers/preferreddrivers.xml
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/print-applet.desktop
+systemd                      49       /etc/
+                                      /etc/X11/
+                                      /etc/X11/xinit/
+                                      /etc/X11/xinit/xinitrc.d/
+                                      /etc/X11/xinit/xinitrc.d/50-systemd-user.sh
+                                      /etc/binfmt.d/
+                                      /etc/credstore.encrypted/
+                                      /etc/credstore/
+                                      /etc/cryptsetup-keys.d/
+                                      /etc/kernel/
+                                      /etc/kernel/install.d/
+                                      /etc/modules-load.d/
+                                      /etc/profile.d/
+                                      /etc/profile.d/70-systemd-shell-extra.sh
+                                      /etc/profile.d/80-systemd-osc-context.sh
+                                      /etc/ssh/
+                                      /etc/ssh/ssh_config.d/
+                                      /etc/ssh/ssh_config.d/20-systemd-ssh-proxy.conf
+                                      /etc/ssh/sshd_config.d/
+                                      /etc/ssh/sshd_config.d/20-systemd-userdb.conf
+                                      /etc/sysctl.d/
+                                      /etc/systemd/
+                                      /etc/systemd/coredump.conf
+                                      /etc/systemd/homed.conf
+                                      /etc/systemd/journal-remote.conf
+                                      /etc/systemd/journal-upload.conf
+                                      /etc/systemd/journald.conf
+                                      /etc/systemd/logind.conf
+                                      /etc/systemd/network/
+                                      /etc/systemd/networkd.conf
+                                      /etc/systemd/oomd.conf
+                                      /etc/systemd/pstore.conf
+                                      /etc/systemd/resolved.conf
+                                      /etc/systemd/sleep.conf
+                                      /etc/systemd/system.conf
+                                      /etc/systemd/system/
+                                      /etc/systemd/timesyncd.conf
+                                      /etc/systemd/user.conf
+                                      /etc/systemd/user/
+                                      /etc/tmpfiles.d/
+                                      /etc/udev/
+                                      /etc/udev/hwdb.d/
+                                      /etc/udev/iocost.conf
+                                      /etc/udev/rules.d/
+                                      /etc/udev/udev.conf
+                                      /etc/user-tmpfiles.d/
+                                      /etc/xdg/
+                                      /etc/xdg/systemd/
+                                      /etc/xdg/systemd/user
+timeshift                    3        /etc/
+                                      /etc/timeshift/
+                                      /etc/timeshift/default.json
+timeshift-autosnap           2        /etc/
+                                      /etc/timeshift-autosnap.conf
+tpm2-tss                     14       /etc/
+                                      /etc/tpm2-tss/
+                                      /etc/tpm2-tss/fapi-config.json
+                                      /etc/tpm2-tss/fapi-profiles/
+                                      /etc/tpm2-tss/fapi-profiles/P_ECCP256SHA256-high-range.json
+                                      /etc/tpm2-tss/fapi-profiles/P_ECCP256SHA256-legacy.json
+                                      /etc/tpm2-tss/fapi-profiles/P_ECCP256SHA256-low-range.json
+                                      /etc/tpm2-tss/fapi-profiles/P_ECCP256SHA256.json
+                                      /etc/tpm2-tss/fapi-profiles/P_ECCP384SHA384.json
+                                      /etc/tpm2-tss/fapi-profiles/P_RSA2048SHA256-high-range.json
+                                      /etc/tpm2-tss/fapi-profiles/P_RSA2048SHA256-legacy.json
+                                      /etc/tpm2-tss/fapi-profiles/P_RSA2048SHA256-low-range.json
+                                      /etc/tpm2-tss/fapi-profiles/P_RSA2048SHA256.json
+                                      /etc/tpm2-tss/fapi-profiles/P_RSA3072SHA384.json
+tslib                        2        /etc/
+                                      /etc/ts.conf
+tumbler                      4        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/tumbler/
+                                      /etc/xdg/tumbler/tumbler.rc
+udisks2                      4        /etc/
+                                      /etc/udisks2/
+                                      /etc/udisks2/mount_options.conf.example
+                                      /etc/udisks2/udisks2.conf
+upower                       5        /etc/
+                                      /etc/UPower/
+                                      /etc/UPower/UPower.conf
+                                      /etc/UPower/UPower.conf.d/
+                                      /etc/UPower/UPower.conf.d/README.md
+usb_modeswitch               4        /etc/
+                                      /etc/usb_modeswitch.conf
+                                      /etc/usb_modeswitch.d/
+                                      /etc/usb_modeswitch.setup
+util-linux                   10       /etc/
+                                      /etc/pam.d/
+                                      /etc/pam.d/chfn
+                                      /etc/pam.d/chsh
+                                      /etc/pam.d/login
+                                      /etc/pam.d/remote
+                                      /etc/pam.d/runuser
+                                      /etc/pam.d/runuser-l
+                                      /etc/pam.d/su
+                                      /etc/pam.d/su-l
+v4l-utils                    4        /etc/
+                                      /etc/rc_keymaps/
+                                      /etc/rc_keymaps/protocols/
+                                      /etc/rc_maps.cfg
+vapoursynth                  3        /etc/
+                                      /etc/profile.d/
+                                      /etc/profile.d/vapoursynth.sh
+vde2                         8        /etc/
+                                      /etc/vde2/
+                                      /etc/vde2/libvdemgmt/
+                                      /etc/vde2/libvdemgmt/asyncrecv.rc
+                                      /etc/vde2/libvdemgmt/closemachine.rc
+                                      /etc/vde2/libvdemgmt/openmachine.rc
+                                      /etc/vde2/libvdemgmt/sendcmd.rc
+                                      /etc/vde2/vdecmd
+vpnc                         4        /etc/
+                                      /etc/vpnc/
+                                      /etc/vpnc/default.conf
+                                      /etc/vpnc/vpnc-script
+vte-common                   4        /etc/
+                                      /etc/profile.d/
+                                      /etc/profile.d/vte.csh
+                                      /etc/profile.d/vte.sh
+wget                         2        /etc/
+                                      /etc/wgetrc
+wireguard-tools              2        /etc/
+                                      /etc/wireguard/
+wireless-regdb               3        /etc/
+                                      /etc/conf.d/
+                                      /etc/conf.d/wireless-regdom
+wpa_supplicant               2        /etc/
+                                      /etc/wpa_supplicant/
+wvdial                       5        /etc/
+                                      /etc/ppp/
+                                      /etc/ppp/peers/
+                                      /etc/ppp/peers/wvdial
+                                      /etc/ppp/peers/wvdial-pipe
+wvstreams                    2        /etc/
+                                      /etc/uniconf.conf
+xapp                         8        /etc/
+                                      /etc/X11/
+                                      /etc/X11/xinit/
+                                      /etc/X11/xinit/xinitrc.d/
+                                      /etc/X11/xinit/xinitrc.d/80xapp-gtk3-module.sh
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/xapp-sn-watcher.desktop
+xdg-user-dirs                6        /etc/
+                                      /etc/xdg/
+                                      /etc/xdg/autostart/
+                                      /etc/xdg/autostart/xdg-user-dirs.desktop
+                                      /etc/xdg/user-dirs.conf
+                                      /etc/xdg/user-dirs.defaults
+xl2tpd                       6        /etc/
+                                      /etc/ppp/
+                                      /etc/ppp/options.l2tpd
+                                      /etc/xl2tpd/
+                                      /etc/xl2tpd/xl2tpd.conf.client-example
+                                      /etc/xl2tpd/xl2tpd.conf.server-example
+xorg-server                  3        /etc/
+                                      /etc/X11/
+                                      /etc/X11/xorg.conf.d/
+xorg-xinit                   5        /etc/
+                                      /etc/X11/
+                                      /etc/X11/xinit/
+                                      /etc/X11/xinit/xinitrc
+                                      /etc/X11/xinit/xserverrc
+zsh                          3        /etc/
+                                      /etc/zsh/
+                                      /etc/zsh/zprofile
+--------------------------------------------------------------------------------
+Summary: 189 packages with configs, 1676 total config files
+(Showing first 50 entries)

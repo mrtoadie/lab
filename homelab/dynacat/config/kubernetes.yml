@@ -1,0 +1,119 @@
+- name: K3S Cluster
+  width: slim
+  center-vertically: true
+  name-icon: mdi:kubernetes
+  columns:
+    - size: full
+      widgets:
+        - type: server-stats
+          servers:
+            - name: winterfell
+              url: http://192.168.178.210:27973
+              timeout: 5m
+              token: 1NmWH50WhsbtZmffynO882rEVYggnhaj
+              type: remote
+            - name: worker01
+              url: http://192.168.178.212:27973
+              timeout: 5m
+              token: jtTST8b3tGpgHbUY6LPBtHFUFm8FeXim
+              type: remote
+            - name: worker02
+              url: http://192.168.178.214:27973
+              timeout: 5m
+              token: LfExy31mmYB7rZObDYWwCPDaSHIh8497
+              type: remote
+            - name: worker03
+              url: http://192.168.178.216:27973
+              timeout: 5m
+              token: A2T8ODXHXklOCvfvrBLbUlj92aVcTh7N
+              type: remote
+        - type: custom-api
+          title: k3s Nodes
+          cache: 2m
+          url: https://192.168.178.210:6443/api/v1/nodes
+          allow-insecure: true
+          headers:
+            Authorization: Bearer ${KUBE_TOKEN}
+          template: |
+            {{ $nodes := .JSON.Array "items" }}
+            <div><strong>{{ len $nodes }} Nodes</strong></div>
+            {{ range $nodes }}
+            <div>{{ .String "metadata.name" }}
+              {{ if eq (.String "status.conditions.3.status") "True" }}
+                <span style="color:#4ade80">✓ Ready</span>
+              {{ else }}
+                <span style="color:#f87171">✗ Not Ready</span>
+              {{ end }}
+            </div>
+            {{ end }}
+        - type: custom-api
+          title: k3s Nodes
+          cache: 2m
+          url: https://192.168.178.210:6443/api/v1/nodes
+          allow-insecure: true
+          headers:
+            Authorization: Bearer ${KUBE_TOKEN}
+          template: |
+            {{ $nodes := .JSON.Array "items" }}
+            <div><strong>{{ len $nodes }} Nodes</strong></div>
+            {{ range $nodes }}
+            <div>{{ .String "metadata.name" }}
+              {{ if eq (.String "status.conditions.3.status") "True" }}
+                <span style="color:#4ade80">✓ Ready</span>
+              {{ else }}
+                <span style="color:#f87171">✗ Not Ready</span>
+              {{ end }}
+            </div>
+            {{ end }}
+        - type: custom-api
+          title: Pods by Namespace
+          cache: 2m
+          url: https://192.168.178.210:6443/api/v1/pods
+          allow-insecure: true
+          headers:
+            Authorization: Bearer ${KUBE_TOKEN}
+          template: |
+            {{ $pods := .JSON.Array "items" }}
+            <div><strong>{{ len $pods }} Pods Total</strong></div>
+            {{ range $pods }}
+            <div>{{ .String "metadata.namespace" }}/{{ .String "metadata.name" }}
+            <span style="color:{{ if eq (.String "status.phase") "Running" }}#4ade80{{ else }}#fbbf24{{ end }}">
+            {{ .String "status.phase" }}
+            </span>
+            </div>
+            {{ end }}
+        - type: custom-api
+          title: Pod Health
+          cache: 2m
+          url: https://192.168.178.210:6443/api/v1/pods?fieldSelector=status.phase!=Running
+          allow-insecure: true
+          headers:
+            Authorization: Bearer ${KUBE_TOKEN}
+          template: |
+            {{ $pods := .JSON.Array "items" }}
+            <div><strong>{{ len $pods }} Non-Running Pods</strong></div>
+            {{ range $pods }}
+            <div style="color: #f87171;">
+              {{ .String "metadata.name" }} ({{ .String "status.phase" }})
+            </div>
+            {{ end }}
+            {{ if eq (len $pods) 0 }}
+            <div style="color: #4ade80;">✓ All Pods Running</div>
+            {{ end }}
+        - type: group
+          widgets:
+            - type: custom-api
+              title: Storage (PVs)
+              cache: 5m
+              url: https://192.168.178.210:6443/api/v1/persistentvolumes
+              allow-insecure: true
+              headers:
+                Authorization: Bearer ${KUBE_TOKEN}
+              template: |-
+                {{ $pvs := .JSON.Array "items" }}
+                <div><strong>{{ len $pvs }} PVs</strong></div>
+                {{ range $pvs }}
+                <div>{{ .String "metadata.name" }}:
+                  {{ .String "status.phase" }}
+                </div>
+                {{ end }}
