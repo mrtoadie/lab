@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bookorbit
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bookorbit-secrets
+  namespace: bookorbit
+type: Opaque
+stringData:
+  postgres-password: "7*U3Dw9@&3PAk71@^^8K"
+  jwt-secret: "@dOHi8@k6n84F2BX@c7%"
+  bootstrap-token: "u%Fs!qT695zSvs5js@dJ"

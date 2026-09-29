@@ -1,4 +1,7 @@
 ---
+# pi_shutdown_alternative.yml — clean shutdown of all Pi's
+# usage: ansible-playbook -i inventory.ini pi_shutdown_alternative.yml -K
+# works not everytime
 - name: Controlled shutdown sequence
   hosts: pi_cluster
   become: true

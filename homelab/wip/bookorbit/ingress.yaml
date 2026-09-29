@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bookorbit-ingress
+  namespace: bookorbit
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: bookorbit.toadie.de
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bookorbit
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - bookorbit.toadie.de
+      secretName: bookorbit-tls

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookorbit
+  namespace: bookorbit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bookorbit
+  template:
+    metadata:
+      labels:
+        app: bookorbit
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret # falls benötigt
+      containers:
+        - name: bookorbit
+          image: ghcr.io/bookorbit/bookorbit:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_URL
+              value: "https://bookorbit.toadie.de"
+            - name: BOOKS_HOST_PATH
+              value: "/books"
+            # PostgreSQL Credentials separat
+            - name: POSTGRES_USER
+              value: "bookorbit"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bookorbit-secrets
+                  key: postgres-password
+            - name: POSTGRES_HOST
+              value: "postgres.bookorbit.svc.cluster.local"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "bookorbit"
+            # DATABASE_URL wird automatisch gebaut ODER explizit setzen:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: bookorbit-db-url # Neues Secret
+                  key: url
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bookorbit-secrets
+                  key: jwt-secret
+            - name: SETUP_BOOTSTRAP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: bookorbit-secrets
+                  key: bootstrap-token
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+          volumeMounts:
+            - name: books
+              mountPath: /books
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      volumes:
+        - name: books
+          persistentVolumeClaim:
+            claimName: books-data
