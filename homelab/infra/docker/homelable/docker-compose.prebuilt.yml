@@ -1,0 +1,52 @@
+services:
+  backend:
+    image: ghcr.io/pouzor/homelable-backend:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SQLITE_PATH: /app/data/homelab.db
+      CORS_ORIGINS: '["http://localhost:3000"]'
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - homelable
+    cap_add:
+      - NET_RAW
+    # MAC addresses: on this bridge network the scanner can never see them —
+    # ARP is layer 2 and every LAN host is one hop away behind the Docker
+    # gateway. To collect MACs (and so keep DHCP devices matched across an IP
+    # change), put the backend on the LAN: comment out the `networks:` key
+    # above and uncomment the line below (Linux hosts only).
+    # network_mode: host
+
+  frontend:
+    image: ghcr.io/pouzor/homelable-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+    networks:
+      - homelable
+
+  mcp:
+    image: ghcr.io/pouzor/homelable-mcp:latest
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    environment:
+      BACKEND_URL: "http://backend:8000"
+    depends_on:
+      - backend
+    networks:
+      - homelable
+
+volumes:
+  backend_data:
+
+networks:
+  homelable:
+    driver: bridge
