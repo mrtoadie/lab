@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: update-kuma
+  name: uptime-kuma
   labels:
     pod-security.kubernetes.io/enforce: baseline
     pod-security.kubernetes.io/warn: restricted
@@ -11,7 +11,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: uptime-kuma-data
-  namespace: monitoring
+  namespace: uptime-kuma
 spec:
   storageClassName: nfs-dynamic
   accessModes:
@@ -24,7 +24,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: uptime-kuma
-  namespace: monitoring
+  namespace: uptime-kuma
   labels:
     app: uptime-kuma
 spec:
@@ -76,7 +76,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: uptime-kuma-svc
-  namespace: monitoring
+  namespace: uptime-kuma
 spec:
   type: NodePort
   selector:
@@ -90,12 +90,12 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: uptime-kuma-ingress
-  namespace: monitoring
+  namespace: uptime-kuma
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
-    - host: kuma.local
+    - host: kuma.winter.local
       http:
         paths:
           - path: /

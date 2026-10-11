@@ -21,7 +21,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
 spec:
   rules:
-    - host: code.winterfell.cluster.pi.local
+    - host: code.local
       http:
         paths:
           - path: /

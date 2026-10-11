@@ -1,0 +1,47 @@
+---
+- name: Docker Volume Analysis (Non-Root)
+  hosts: localhost
+  gather_facts: no
+  
+  vars:
+    docker_mount_point: "/run/media/toadie/vm/DockerSystem"
+  
+  tasks:
+    - name: Verify Docker mount point exists
+      ansible.builtin.stat:
+        path: "{{ docker_mount_point }}"
+      register: mount_check
+      
+    - name: Confirm mount point availability
+      ansible.builtin.assert:
+        that: mount_check.stat.exists
+        fail_msg: "Docker mount point not found at {{ docker_mount_point }}"
+        
+    - name: Run docker commands directly
+      ansible.builtin.command:
+        cmd: "{{ item.cmd }}"
+      loop:
+        - cmd: "docker system df -v"
+        - cmd: "docker volume ls"
+        - cmd: "docker images --format 'table {{.Repository}}\t{{.Tag}}\t{{.Size}}'"
+      register: docker_commands
+      changed_when: false
+      
+    - name: Display collected information
+      ansible.builtin.debug:
+        var: item.stdout
+      loop: "{{ docker_commands.results }}"
+      
+    - name: Check permissions on Docker volumes
+      ansible.builtin.shell: |
+        if [ -d "{{ docker_mount_point }}/volumes" ]; then
+          ls -lh "{{ docker_mount_point }}/volumes/" | tail -n +2
+        else
+          echo "Volumes directory not found or accessible"
+        fi
+      register: volume_permissions
+      changed_when: false
+      
+    - name: Show volume directory listing
+      ansible.builtin.debug:
+        msg: "{{ volume_permissions.stdout_lines }}"

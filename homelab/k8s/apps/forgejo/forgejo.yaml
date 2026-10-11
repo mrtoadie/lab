@@ -82,7 +82,7 @@ spec:
     - name: http
       port: 3000
       targetPort: 3000
-      nodePort: 30080
+      #nodePort: 30080
     - name: ssh
       port: 2222
       targetPort: 22
