@@ -1,5 +1,5 @@
 - name: K3S Cluster
-  width: slim
+  width: default
   center-vertically: true
   name-icon: mdi:kubernetes
   columns:
@@ -27,44 +27,46 @@
               timeout: 5m
               token: A2T8ODXHXklOCvfvrBLbUlj92aVcTh7N
               type: remote
-        - type: custom-api
-          title: k3s Nodes
-          cache: 2m
-          url: https://192.168.178.210:6443/api/v1/nodes
-          allow-insecure: true
-          headers:
-            Authorization: Bearer ${KUBE_TOKEN}
-          template: |
-            {{ $nodes := .JSON.Array "items" }}
-            <div><strong>{{ len $nodes }} Nodes</strong></div>
-            {{ range $nodes }}
-            <div>{{ .String "metadata.name" }}
-              {{ if eq (.String "status.conditions.3.status") "True" }}
-                <span style="color:#4ade80">✓ Ready</span>
-              {{ else }}
-                <span style="color:#f87171">✗ Not Ready</span>
-              {{ end }}
-            </div>
-            {{ end }}
-        - type: custom-api
-          title: k3s Nodes
-          cache: 2m
-          url: https://192.168.178.210:6443/api/v1/nodes
-          allow-insecure: true
-          headers:
-            Authorization: Bearer ${KUBE_TOKEN}
-          template: |
-            {{ $nodes := .JSON.Array "items" }}
-            <div><strong>{{ len $nodes }} Nodes</strong></div>
-            {{ range $nodes }}
-            <div>{{ .String "metadata.name" }}
-              {{ if eq (.String "status.conditions.3.status") "True" }}
-                <span style="color:#4ade80">✓ Ready</span>
-              {{ else }}
-                <span style="color:#f87171">✗ Not Ready</span>
-              {{ end }}
-            </div>
-            {{ end }}
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: custom-api
+              title: k3s Nodes
+              cache: 2m
+              url: https://192.168.178.210:6443/api/v1/nodes
+              allow-insecure: true
+              headers:
+                Authorization: Bearer ${KUBE_TOKEN}
+              template: |
+                {{ $nodes := .JSON.Array "items" }}
+                <div><strong>{{ len $nodes }} Nodes</strong></div>
+                {{ range $nodes }}
+                <div>{{ .String "metadata.name" }}
+                  {{ if eq (.String "status.conditions.3.status") "True" }}
+                    <span style="color:#4ade80">✓ Ready</span>
+                  {{ else }}
+                    <span style="color:#f87171">✗ Not Ready</span>
+                  {{ end }}
+                </div>
+                {{ end }}
+            - type: custom-api
+              title: Pod Health
+              cache: 2m
+              url: https://192.168.178.210:6443/api/v1/pods?fieldSelector=status.phase!=Running
+              allow-insecure: true
+              headers:
+                Authorization: Bearer ${KUBE_TOKEN}
+              template: |
+                {{ $pods := .JSON.Array "items" }}
+                <div><strong>{{ len $pods }} Non-Running Pods</strong></div>
+                {{ range $pods }}
+                <div style="color: #f87171;">
+                  {{ .String "metadata.name" }} ({{ .String "status.phase" }})
+                </div>
+                {{ end }}
+                {{ if eq (len $pods) 0 }}
+                <div style="color: #4ade80;">✓ All Pods Running</div>
+                {{ end }}
         - type: custom-api
           title: Pods by Namespace
           cache: 2m
@@ -81,24 +83,6 @@
             {{ .String "status.phase" }}
             </span>
             </div>
-            {{ end }}
-        - type: custom-api
-          title: Pod Health
-          cache: 2m
-          url: https://192.168.178.210:6443/api/v1/pods?fieldSelector=status.phase!=Running
-          allow-insecure: true
-          headers:
-            Authorization: Bearer ${KUBE_TOKEN}
-          template: |
-            {{ $pods := .JSON.Array "items" }}
-            <div><strong>{{ len $pods }} Non-Running Pods</strong></div>
-            {{ range $pods }}
-            <div style="color: #f87171;">
-              {{ .String "metadata.name" }} ({{ .String "status.phase" }})
-            </div>
-            {{ end }}
-            {{ if eq (len $pods) 0 }}
-            <div style="color: #4ade80;">✓ All Pods Running</div>
             {{ end }}
         - type: group
           widgets:
