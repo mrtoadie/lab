@@ -1,0 +1,189 @@
+- name: Dashboard
+  name-icon: mdi:home
+  # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
+  # hide-desktop-navigation: true
+  columns:
+    - size: small
+      widgets:
+        - type: clock
+          hour-format: 24h
+          hide-header: true
+        - type: weather
+          units: metric
+          hour-format: 24h
+          location: Frankfurt, Germany
+          show-area-name: true
+          update-interval: 30m
+        - type: releases
+          cache: 1d
+          repositories:
+            - Panonim/dynacat
+            - alexta69/metube
+            - advplyr/audiobookshelf
+            - mrtoadie/go-velero-manager
+            - syncthing/syncthing
+    - size: full
+      widgets:
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: to-do
+              storage: local
+              title: To-Do
+              title-icon: si:obsidian
+          title: start
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: server-stats
+              servers:
+                - name: toad
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  type: local
+                - name: winterfell
+                  url: http://192.168.178.210:27973
+                  compact: false
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: 1NmWH50WhsbtZmffynO882rEVYggnhaj
+                  type: remote
+                - name: worker01
+                  url: http://192.168.178.212:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: jtTST8b3tGpgHbUY6LPBtHFUFm8FeXim
+                  type: remote
+                - name: worker02
+                  url: http://192.168.178.214:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: LfExy31mmYB7rZObDYWwCPDaSHIh8497
+                  type: remote
+                - name: worker03
+                  url: http://192.168.178.216:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: A2T8ODXHXklOCvfvrBLbUlj92aVcTh7N
+                  type: remote
+            - type: monitor
+              cache: 1m
+              title: services
+              sites:
+                - title: toadie.de/rss
+                  url: https://toadie.de/rssread/
+                  icon: si:rss
+                  description: Web
+                - title: Grafana
+                  url: http://grafana.local/api/health
+                  icon: si:grafana
+                  description: K3S
+                - title: Forgejo
+                  url: http://192.168.178.210:30080/
+                  icon: si:forgejo
+                  description: K3S
+                - title: AudioBookShelf
+                  url: http://192.168.178.101:13378/
+                  icon: si:audiobookshelf
+                  description: Docker
+                - title: Homelable
+                  url: http://192.168.178.101:3001/
+                  icon: si:homepage
+                  description: Docker
+                - title: Bookorbit
+                  url: http://192.168.178.101:3000/
+                  icon: si:gitbook
+                  description: Docker
+                - title: MinIO
+                  url: http://192.168.178.101:9001
+                  icon: si:minio
+                  description: Docker
+                  alt-status-codes: []
+              show-history: true
+        - type: bookmarks
+          groups:
+            - title: Dev
+              hide-arrow: true
+              links:
+                - title: Github
+                  url: https://github.com/mrtoadie
+                  icon: si:github
+                - title: AUR
+                  url: https://aur.archlinux.org/account/mrtoadie
+                  icon: si:archlinux
+                - title: Codeberg
+                  url: https://codeberg.org
+                  icon: si:codeberg
+            - title: Refernces
+              links:
+                - title: K8S Reference
+                  url: https://kubernetes.io/docs/reference/
+                  description: Documentation
+                - title: steven-garcia.dev
+                  url: https://www.steven-garcia.dev
+                  description: 'Blog :: Homelab'
+            - title: Linux
+              links:
+                - title: Linux Guides Community
+                  url: https://forum.linuxguides.de
+                  description: Forum
+                - title: Linux Community.io
+                  url: https://linuxcommunity.io
+                  description: Forum
+                - title: Packt
+                  url: https://subscription.packtpub.com/owned
+                  description: Learn
+            - title: Panels
+              color: 10 70 50
+              hide-arrow: true
+              links:
+                - title: Grafana
+                  url: http://grafana.local
+                  icon: si:grafana
+                - title: Uptime-Kuma
+                  url: http://192.168.178.210:32001/dashboard
+                  icon: si:uptimekuma
+                - title: Forgejo
+                - title: Prometheus
+                - title: Velero
+        - type: split-column
+          max-columns: 3
+          widgets:
+            - type: repository
+              repository: mrtoadie/go-velero-manager
+              hide-header: false
+              title-icon: si:go
+              title: velero-manager
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+            - type: repository
+              repository: mrtoadie/go-check-cert
+              hide-header: false
+              title: cert-checker
+              title-icon: si:go
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+            - type: repository
+              repository: mrtoadie/kvm-configurator
+              hide-header: false
+              title-icon: si:go
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+              title: kvm-configurator
+          title-icon: si:github
+          cache: 1h
+          title: Repositories
+          update-interval: 1h
+          frameless: false
+          title-url: https://github.com/mrtoadie/
+          hide-header: false
+        - type: html
+          source: <h2 class="uppercase widget-title-wrapper"><span>Docker</span></h2>
+        - type: docker-controller
+          sock-path: http://192.168.178.101
