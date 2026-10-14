@@ -1,6 +1,5 @@
 - name: K3S Cluster
   width: default
-  center-vertically: true
   name-icon: mdi:kubernetes
   columns:
     - size: full
@@ -67,23 +66,6 @@
                 {{ if eq (len $pods) 0 }}
                 <div style="color: #4ade80;">✓ All Pods Running</div>
                 {{ end }}
-        - type: custom-api
-          title: Pods by Namespace
-          cache: 2m
-          url: https://192.168.178.210:6443/api/v1/pods
-          allow-insecure: true
-          headers:
-            Authorization: Bearer ${KUBE_TOKEN}
-          template: |
-            {{ $pods := .JSON.Array "items" }}
-            <div><strong>{{ len $pods }} Pods Total</strong></div>
-            {{ range $pods }}
-            <div>{{ .String "metadata.namespace" }}/{{ .String "metadata.name" }}
-            <span style="color:{{ if eq (.String "status.phase") "Running" }}#4ade80{{ else }}#fbbf24{{ end }}">
-            {{ .String "status.phase" }}
-            </span>
-            </div>
-            {{ end }}
         - type: group
           widgets:
             - type: custom-api
@@ -101,3 +83,22 @@
                   {{ .String "status.phase" }}
                 </div>
                 {{ end }}
+    - size: full
+      widgets:
+        - type: custom-api
+          title: Pods by Namespace
+          cache: 2m
+          url: https://192.168.178.210:6443/api/v1/pods
+          allow-insecure: true
+          headers:
+            Authorization: Bearer ${KUBE_TOKEN}
+          template: |
+            {{ $pods := .JSON.Array "items" }}
+            <div><strong>{{ len $pods }} Pods Total</strong></div>
+            {{ range $pods }}
+            <div>{{ .String "metadata.namespace" }}/{{ .String "metadata.name" }}
+            <span style="color:{{ if eq (.String "status.phase") "Running" }}#4ade80{{ else }}#fbbf24{{ end }}">
+            {{ .String "status.phase" }}
+            </span>
+            </div>
+            {{ end }}

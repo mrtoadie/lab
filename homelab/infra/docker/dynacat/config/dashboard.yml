@@ -1,19 +1,14 @@
-- name: Dasahboard
+- name: Dashboard
   name-icon: mdi:home
   # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
   # hide-desktop-navigation: true
   columns:
     - size: small
       widgets:
-        - type: clock
-          hour-format: 24h
-          hide-header: true
-        - type: weather
-          units: metric
-          hour-format: 24h
-          location: Frankfurt, Germany
-          show-area-name: true
-          update-interval: 30m
+        - type: to-do
+          storage: local
+          title: To-Do
+          title-icon: si:obsidian
         - type: releases
           cache: 1d
           repositories:
@@ -22,21 +17,64 @@
             - advplyr/audiobookshelf
             - mrtoadie/go-velero-manager
             - syncthing/syncthing
+          show-source-icon: true
+        - type: bookmarks
+          groups:
+            - title: Dev
+              hide-arrow: true
+              links:
+                - title: Github
+                  url: https://github.com/mrtoadie
+                  icon: si:github
+                - title: AUR
+                  url: https://aur.archlinux.org/account/mrtoadie
+                  icon: si:archlinux
+                - title: Codeberg
+                  url: https://codeberg.org
+                  icon: si:codeberg
+            - title: Kubernetes
+              links:
+                - title: K8S Reference
+                  url: https://kubernetes.io/docs/reference/
+                  description: Documentation
+                - title: steven-garcia.dev
+                  url: https://www.steven-garcia.dev
+                  description: 'Blog :: Homelab'
+            - title: Linux
+              links:
+                - title: Linux Guides Community
+                  url: https://forum.linuxguides.de
+                  description: Forum
+                - title: Linux Community.io
+                  url: https://linuxcommunity.io
+                  description: Forum
+                - title: Packt
+                  url: https://subscription.packtpub.com/owned
+                  description: Learn
+          frameless: false
     - size: full
       widgets:
+        - type: search
+          autocomplete: true
+          autocomplete-provider: brave
+          frameless: true
+          search-engine: brave
+          include-bookmarks: true
+          new-tab: true
         - type: split-column
           max-columns: 2
           widgets:
             - type: server-stats
               servers:
                 - name: toad
-                  hide-mountpoints-by-default: true
+                  url: 192.168.178.101
+                  hide-mountpoints-by-default: false
                   timeout: 5m
                   type: local
                 - name: winterfell
                   url: http://192.168.178.210:27973
                   compact: false
-                  hide-mountpoints-by-default: true
+                  hide-mountpoints-by-default: false
                   timeout: 5m
                   token: 1NmWH50WhsbtZmffynO882rEVYggnhaj
                   type: remote
@@ -58,6 +96,9 @@
                   timeout: 5m
                   token: A2T8ODXHXklOCvfvrBLbUlj92aVcTh7N
                   type: remote
+                - name: watcher
+                  url: http://192.168.178.199:27973
+                  token: S6TOSusSg0BdK54pJ25VfqsqMqOlucFK
             - type: monitor
               cache: 1m
               title: services
@@ -67,94 +108,43 @@
                   icon: si:rss
                   description: Web
                 - title: Grafana
-                  url: http://grafana.local/
+                  url: http://grafana.local
                   icon: si:grafana
                   description: K3S
-                - title: Uptime-Kuma
-                  url: http://192.168.178.210:3001
-                  icon: si:uptimekuma
+                  check-url: http://grafana.local/api/health
+                  method: GET
+                - title: Prometheus
+                  url: http://prometheus.local
+                  icon: si:prometheus
                   description: K3S
-                  check-url: http://192.168.178.210:32001/dashboard
+                  check-url: http://prometheus.local/-/healthy
                 - title: Forgejo
                   url: http://192.168.178.210:30080/
                   icon: si:forgejo
                   description: K3S
-                - title: Code Server
-                  url: http://localhost:39427/
-                  icon: si:vscodium
-                  description: K3S
                 - title: AudioBookShelf
-                  url: http://localhost:13378/
+                  url: http://192.168.178.101:13378/
                   icon: si:audiobookshelf
-                  description: Docker
+                  description: Docker@192.168.178.101
                 - title: Homelable
-                  url: http://localhost:3001/
+                  url: http://192.168.178.101:3001/
                   icon: si:homepage
-                  description: Docker
+                  description: Docker@192.168.178.101
                 - title: Bookorbit
                   url: http://192.168.178.101:3000/
                   icon: si:gitbook
-                  description: Docker
+                  description: Docker@192.168.178.101
                 - title: MinIO
-                  url: http://localhost:9001
+                  url: http://192.168.178.101:9001
                   icon: si:minio
-                  description: Docker
+                  description: Docker@192.168.178.101
                   alt-status-codes: []
+                  check-url: http://192.168.178.101:9001/minio/health/live
+                - title: metube
+                  url: http://192.168.178.101:8081/
+                  icon: si:youtube
+                  description: Docker@192.168.178.101
               show-history: true
-        - type: bookmarks
-          groups:
-            - title: Dev
-              hide-arrow: true
-              links:
-                - title: Github
-                  url: https://github.com/mrtoadie
-                  icon: si:github
-                - title: AUR
-                  url: https://aur.archlinux.org/account/mrtoadie
-                  icon: si:archlinux
-                - title: Codeberg
-                  url: https://codeberg.org
-                  icon: si:codeberg
-            - title: Refernces
-              links:
-                - title: K8S Reference
-                  url: https://kubernetes.io/docs/reference/
-                  description: Documentation
-                - title: steven-garcia.dev
-                  url: https://www.steven-garcia.dev
-                  description: 'Blog :: Homelab'
-            - title: Linux
-              links:
-                - title: Linux Guides Community
-                  url: https://forum.linuxguides.de
-                  description: Forum
-                - title: Linux Community.io
-                  url: https://linuxcommunity.io
-                  description: Forum
-                - title: Packt
-                  url: https://subscription.packtpub.com/owned
-                  description: Learn
-            - title: Panels
-              color: 10 70 50
-              hide-arrow: true
-              links:
-                - title: Grafana
-                  url: http://grafana.local
-                  icon: si:grafana
-                - title: Uptime-Kuma
-                  url: http://192.168.178.210:32001/dashboard
-                  icon: si:uptimekuma
-                - title: Forgejo
-                - title: Prometheus
-                - title: Velero
-        - type: split-column
-          max-columns: 2
-          widgets:
-            - type: to-do
-              storage: local
-              title: To-Do
-              title-icon: si:obsidian
-          title: start
         - type: split-column
           max-columns: 3
           widgets:
@@ -192,7 +182,16 @@
           frameless: false
           title-url: https://github.com/mrtoadie/
           hide-header: false
-        - type: html
-          source: <h2 class="uppercase widget-title-wrapper"><span>Docker</span></h2>
+        - type: docker-containers
         - type: docker-controller
-        - type: split-column
+    - size: small
+      widgets:
+        - type: clock
+          hour-format: 24h
+          hide-header: true
+        - type: weather
+          units: metric
+          hour-format: 24h
+          location: Frankfurt, Germany
+          show-area-name: true
+          update-interval: 30m
