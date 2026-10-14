@@ -1,6 +1,5 @@
 - name: K3S Cluster
   width: default
-  center-vertically: true
   name-icon: mdi:kubernetes
   desktop-navigation-width: default
   columns:

@@ -38,6 +38,7 @@
             - type: server-stats
               servers:
                 - name: toad
+                  url: 192.168.178.101
                   hide-mountpoints-by-default: true
                   timeout: 5m
                   type: local
@@ -66,6 +67,8 @@
                   timeout: 5m
                   token: A2T8ODXHXklOCvfvrBLbUlj92aVcTh7N
                   type: remote
+                - name: watcher
+                  url: http://192.168.178.101:2797
             - type: monitor
               cache: 1m
               title: services
@@ -85,20 +88,24 @@
                 - title: AudioBookShelf
                   url: http://192.168.178.101:13378/
                   icon: si:audiobookshelf
-                  description: Docker
+                  description: Docker@192.168.178.101
                 - title: Homelable
                   url: http://192.168.178.101:3001/
                   icon: si:homepage
-                  description: Docker
+                  description: Docker@192.168.178.101
                 - title: Bookorbit
                   url: http://192.168.178.101:3000/
                   icon: si:gitbook
-                  description: Docker
+                  description: Docker@192.168.178.101
                 - title: MinIO
                   url: http://192.168.178.101:9001
                   icon: si:minio
-                  description: Docker
+                  description: Docker@192.168.178.101
                   alt-status-codes: []
+                - title: metube
+                  url: http://192.168.178.101:8081/
+                  icon: si:youtube
+                  description: Docker@192.168.178.101
               show-history: true
         - type: bookmarks
           groups:
@@ -114,7 +121,7 @@
                 - title: Codeberg
                   url: https://codeberg.org
                   icon: si:codeberg
-            - title: Refernces
+            - title: Kubernetes
               links:
                 - title: K8S Reference
                   url: https://kubernetes.io/docs/reference/
@@ -139,13 +146,15 @@
               links:
                 - title: Grafana
                   url: http://grafana.local
-                  icon: si:grafana
-                - title: Uptime-Kuma
-                  url: http://192.168.178.210:32001/dashboard
-                  icon: si:uptimekuma
+                  icon: di:grafana
                 - title: Forgejo
+                  icon: di:forgejo
                 - title: Prometheus
-                - title: Velero
+                  url: http://prometheus.local
+                  icon: di:prometheus
+                - title: Velero / miniIO
+                  url: http://192.168.178.101:9001
+                  icon: di:velero
         - type: split-column
           max-columns: 3
           widgets:
@@ -183,7 +192,3 @@
           frameless: false
           title-url: https://github.com/mrtoadie/
           hide-header: false
-        - type: html
-          source: <h2 class="uppercase widget-title-wrapper"><span>Docker</span></h2>
-        - type: docker-controller
-          sock-path: http://192.168.178.101
