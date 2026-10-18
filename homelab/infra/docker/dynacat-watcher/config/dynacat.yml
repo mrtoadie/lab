@@ -1,9 +1,10 @@
 server:
   assets-path: /app/assets
-#theme:
-# Note: assets are cached by the browser, changes to the CSS file
-# will not be reflected until the browser cache is cleared (Ctrl+F5)
-#  custom-css-file: /assets/user.css
+branding:
+  logo-url: /assets/logo.png        # Zeigt dein Bild anstelle des "G"
+  favicon-url: /assets/favico.png     # Browser-Tab Icon
+  hide-logo: false                  # Standard: false, kann true sein wenn du nur Text willst
+  app-name: "Homelab"
 theme:
   background-color: 227 11 16
   contrast-multiplier: 1.2
