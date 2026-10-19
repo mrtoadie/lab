@@ -1,0 +1,20 @@
+# grafana/certificate.yaml
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: grafana-tls
+  namespace: grafana
+spec:
+  secretName: grafana-tls
+  duration: 2160h        # 90 Tage
+  renewBefore: 360h      # 15 Tage
+  commonName: grafana.local
+  dnsNames:
+    - grafana.local
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer

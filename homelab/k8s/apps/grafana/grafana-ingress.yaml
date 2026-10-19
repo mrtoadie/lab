@@ -6,6 +6,7 @@ metadata:
   namespace: monitoring
   annotations:
     kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: homelab-ca
 spec:
   rules:
   - host: grafana.local

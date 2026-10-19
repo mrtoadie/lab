@@ -1,0 +1,10 @@
+# audiobookshelf/configmap.yaml (optional, for future expansion)
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: audiobookshelf-config
+  namespace: audiobookshelf
+data:
+  # manage environment variables 
+  APP_VERSION: "latest"
