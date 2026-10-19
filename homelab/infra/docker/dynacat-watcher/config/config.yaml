@@ -1,0 +1,16 @@
+- type: server-stats
+  servers:
+    - type: local
+      name: Watcher
+      hide-mountpoints-by-default: false   # empfohlen im Container!
+      cpu-temp-sensor: cpu_thermal
+      mountpoints:
+        "/":
+          name: Root
+          hide: false
+        "/mnt/data":
+          name: Data
+          hide: true
+        "/mnt/vm":
+          name: VMs
+          hide: true                       # nur im Tooltip

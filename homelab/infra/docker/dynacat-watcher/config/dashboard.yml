@@ -5,15 +5,10 @@
   columns:
     - size: small
       widgets:
-        - type: clock
-          hour-format: 24h
-          hide-header: true
-        - type: weather
-          units: metric
-          hour-format: 24h
-          location: Frankfurt, Germany
-          show-area-name: true
-          update-interval: 30m
+        - type: to-do
+          storage: local
+          title: To-Do
+          title-icon: si:obsidian
         - type: releases
           cache: 1d
           repositories:
@@ -22,139 +17,10 @@
             - advplyr/audiobookshelf
             - mrtoadie/go-velero-manager
             - syncthing/syncthing
-    - size: full
-      widgets:
-        - type: split-column
-          max-columns: 2
-          widgets:
-            - type: to-do
-              storage: local
-              title: To-Do
-              title-icon: si:obsidian
-          title: start
-        - type: split-column
-          max-columns: 2
-          widgets:
-            - type: server-stats
-              servers:
-                - name: toad
-                  url: 192.168.178.101
-                  hide-mountpoints-by-default: true
-                  timeout: 5m
-                  type: local
-                - name: winterfell
-                  url: http://192.168.178.210:27973
-                  compact: false
-                  hide-mountpoints-by-default: true
-                  timeout: 5m
-                  token: 1NmWH50WhsbtZmffynO882rEVYggnhaj
-                  type: remote
-                - name: worker01
-                  url: http://192.168.178.212:27973
-                  hide-mountpoints-by-default: true
-                  timeout: 5m
-                  token: jtTST8b3tGpgHbUY6LPBtHFUFm8FeXim
-                  type: remote
-                - name: worker02
-                  url: http://192.168.178.214:27973
-                  hide-mountpoints-by-default: true
-                  timeout: 5m
-                  token: LfExy31mmYB7rZObDYWwCPDaSHIh8497
-                  type: remote
-                - name: worker03
-                  url: http://192.168.178.216:27973
-                  hide-mountpoints-by-default: true
-                  timeout: 5m
-                  token: A2T8ODXHXklOCvfvrBLbUlj92aVcTh7N
-                  type: remote
-                - name: watcher
-                  url: http://192.168.178.101:2797
-            - type: monitor
-              cache: 1m
-              title: services
-              sites:
-                - title: toadie.de/rss
-                  url: https://toadie.de/rssread/
-                  icon: si:rss
-                  description: Web
-                - title: Grafana
-                  url: http://grafana.local/api/health
-                  icon: si:grafana
-                  description: K3S
-                - title: Forgejo
-                  url: http://192.168.178.210:30080/
-                  icon: si:forgejo
-                  description: K3S
-                - title: AudioBookShelf
-                  url: http://192.168.178.101:13378/
-                  icon: si:audiobookshelf
-                  description: Docker@192.168.178.101
-                - title: Homelable
-                  url: http://192.168.178.101:3001/
-                  icon: si:homepage
-                  description: Docker@192.168.178.101
-                - title: Bookorbit
-                  url: http://192.168.178.101:3000/
-                  icon: si:gitbook
-                  description: Docker@192.168.178.101
-                - title: MinIO
-                  url: http://192.168.178.101:9001
-                  icon: si:minio
-                  description: Docker@192.168.178.101
-                  alt-status-codes: []
-                - title: metube
-                  url: http://192.168.178.101:8081/
-                  icon: si:youtube
-                  description: Docker@192.168.178.101
-              show-history: true
-        - type: bookmarks
-          groups:
-            - title: Dev
-              hide-arrow: true
-              links:
-                - title: Github
-                  url: https://github.com/mrtoadie
-                  icon: si:github
-                - title: AUR
-                  url: https://aur.archlinux.org/account/mrtoadie
-                  icon: si:archlinux
-                - title: Codeberg
-                  url: https://codeberg.org
-                  icon: si:codeberg
-            - title: Kubernetes
-              links:
-                - title: K8S Reference
-                  url: https://kubernetes.io/docs/reference/
-                  description: Documentation
-                - title: steven-garcia.dev
-                  url: https://www.steven-garcia.dev
-                  description: 'Blog :: Homelab'
-            - title: Linux
-              links:
-                - title: Linux Guides Community
-                  url: https://forum.linuxguides.de
-                  description: Forum
-                - title: Linux Community.io
-                  url: https://linuxcommunity.io
-                  description: Forum
-                - title: Packt
-                  url: https://subscription.packtpub.com/owned
-                  description: Learn
-            - title: Panels
-              color: 10 70 50
-              hide-arrow: true
-              links:
-                - title: Grafana
-                  url: http://grafana.local
-                  icon: di:grafana
-                - title: Forgejo
-                  icon: di:forgejo
-                - title: Prometheus
-                  url: http://prometheus.local
-                  icon: di:prometheus
-                - title: Velero / miniIO
-                  url: http://192.168.178.101:9001
-                  icon: di:velero
+            - alam00000/bentopdf
+          show-source-icon: true
+          frameless: false
+          hide-header: false
         - type: split-column
           max-columns: 3
           widgets:
@@ -192,3 +58,180 @@
           frameless: false
           title-url: https://github.com/mrtoadie/
           hide-header: false
+    - size: full
+      widgets:
+        - type: search
+          autocomplete: true
+          autocomplete-provider: brave
+          frameless: true
+          search-engine: brave
+          include-bookmarks: true
+          new-tab: true
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: server-stats
+              servers:
+                - name: winterfell
+                  url: http://192.168.178.210:27973
+                  compact: false
+                  hide-mountpoints-by-default: false
+                  timeout: 5m
+                  token: 1NmWH50WhsbtZmffynO882rEVYggnhaj
+                  type: remote
+                - name: worker01
+                  url: http://192.168.178.212:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: jtTST8b3tGpgHbUY6LPBtHFUFm8FeXim
+                  type: remote
+                - name: worker02
+                  url: http://192.168.178.214:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: LfExy31mmYB7rZObDYWwCPDaSHIh8497
+                  type: remote
+                - name: worker03
+                  url: http://192.168.178.216:27973
+                  hide-mountpoints-by-default: true
+                  timeout: 5m
+                  token: A2T8ODXHXklOCvfvrBLbUlj92aVcTh7N
+                  type: remote
+              title: K3S Cluster
+              title-icon: si:kubernetes
+            - type: monitor
+              cache: 1m
+              title: services
+              sites:
+                - title: toadie.de/rss
+                  url: https://toadie.de/rssread/
+                  icon: si:rss
+                  description: Web
+                - title: Grafana
+                  url: http://grafana.local
+                  icon: si:grafana
+                  description: K3S
+                  check-url: http://grafana.local/api/health
+                  method: GET
+                - title: Prometheus
+                  url: http://prometheus.local
+                  icon: si:prometheus
+                  description: K3S
+                  check-url: http://prometheus.local/-/healthy
+                - title: Forgejo
+                  url: http://forgejo.local
+                  icon: si:forgejo
+                  description: K3S
+                  check-url: http://192.168.178.210:30080/
+                - title: AudioBookShelf
+                  url: http://192.168.178.101:13378/
+                  icon: si:audiobookshelf
+                  description: Docker@192.168.178.101
+                - title: Homelable
+                  url: http://192.168.178.101:3001/
+                  icon: si:homepage
+                  description: Docker@192.168.178.101
+                - title: Bookorbit
+                  url: http://192.168.178.101:3000/
+                  icon: si:gitbook
+                  description: Docker@192.168.178.101
+                - title: MinIO
+                  url: http://192.168.178.101:9001
+                  icon: si:minio
+                  description: Docker@192.168.178.101
+                  alt-status-codes: []
+                - title: metube
+                  url: http://192.168.178.101:8081/
+                  icon: si:youtube
+                  description: Docker@192.168.178.101
+              show-history: true
+              title-icon: si:docker
+          title: Cluster
+          title-icon: si:kubernetes
+        - type: bookmarks
+          groups:
+            - title: Dev
+              hide-arrow: false
+              links:
+                - title: Github
+                  url: https://github.com/mrtoadie
+                - title: AUR
+                  url: https://aur.archlinux.org/account/mrtoadie
+                - title: Codeberg
+                  url: https://codeberg.org
+            - title: References
+              links:
+                - title: Kubernetes Documentation
+                  url: https://kubernetes.io/docs/reference/
+                - title: Helm Documentation
+                  url: https://helm.sh/de/docs
+                - title: Vim Cheatsheets
+                  url: https://devhints.io/vim
+                - title: Linuxcommand
+                  url: https://linuxcommand.dev/
+                - title: Explainshell
+                  url: https://explainshell.com/
+            - title: Linux
+              hide-arrow: true
+              links:
+                - title: Linux Guides Community
+                  url: https://forum.linuxguides.de
+                - title: Linux Community.io
+                  url: https://linuxcommunity.io
+                - title: steven-garcia.dev
+                  url: https://www.steven-garcia.dev
+                  description: 'Blog :: Homelab'
+            - title: Tools
+              hide-arrow: true
+              links:
+                - title: Bentopdf
+                  url: https://www.bentopdf.com/
+                  description: PDF Tools
+                - title: simplelogin.io
+                  url: https://app.simplelogin.io/dashboard/
+                  description: Mail Aliase
+          frameless: false
+    - size: small
+      widgets:
+        - type: clock
+          hour-format: 24h
+          hide-header: true
+        - type: server-stats
+          servers:
+            - name: watcher
+              url: http://192.168.178.199:27973
+              token: S6TOSusSg0BdK54pJ25VfqsqMqOlucFK
+          title: watcher
+          title-icon: si:podman
+          frameless: false
+          hide-header: true
+        - type: custom-api
+          frameless: false
+          template: |-
+            {{ range .JSON.Array "data.result" }}
+                              <div style="font-size: 28px; color: #4D6390;">{{ printf "%.0f" (.Float "value.1") }}</div>
+                            {{ end }}
+          update-interval: 300s
+          url: http://192.168.178.210:30090/api/v1/query?query=velero_backup_total
+          title: Backups
+        - type: custom-api
+          frameless: false
+          template: |-
+            {{ range .JSON.Array "data.result" }}
+                              <div style="color: {{ if lt (.Float "value.1") 24.0 }}green{{ else if lt (.Float "value.1") 48.0 }}orange{{ else }}red{{ end }}">
+                                {{ printf "%.1f" (.Float "value.1") }}h —
+                                {{ if .String "metric.schedule" }}{{ .String "metric.schedule" }}{{ else }}manuell{{ end }}
+                              </div>
+                            {{ end }}
+          title: Last Backups
+          update-interval: 300s
+          url: http://192.168.178.210:30090/api/v1/query?query=%28time%28%29%20-%20velero_backup_last_successful_timestamp%29%20%2F%203600
+        - type: custom-api
+          frameless: false
+          template: |-
+            {{ range .JSON.Array "data.result" }}
+                              <div style="font-size: 28px; color: #4D6390;">{{ printf "%.1f%%" (mul (.Float "value.1") 100) }}</div>
+                            {{ end }}
+          title: Backup Success Rate
+          update-interval: 300s
+          url: http://192.168.178.210:30090/api/v1/query?query=sum%28velero_backup_success_total%29%2Fsum%28velero_backup_attempt_total%29
