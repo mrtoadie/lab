@@ -3,18 +3,30 @@ version: '3.8'
 services:
   dynacat:
     container_name: dynacat
-    image: docker.io/panonim/dynacat:latest
+    image: panonim/dynacat:latest
     restart: unless-stopped
     network_mode: host
+#    network_mode: bridge
+    dns:
+      - 192.168.178.1
+    extra_hosts:
+      - "grafana.local:192.168.178.210"
+      - "prometheus.local:192.168.178.210"
+      - "forgejo.local:192.168.178.210"
+      - "watcher.local:192.168.178.199"
+    ports:
+      - "8080:8080"
     volumes:
+#      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro # new
       - ./config:/app/config
       - ./assets:/app/assets
       - /etc/localtime:/etc/localtime:ro
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-      #- /home/toadie/.ssh/agent:/root/.ssh/agent:ro
-    ports:
-      - 8080:8080
-    env_file: .env
+      # Optional: Für Hardware-Metrics
+      - /sys/class/thermal:/sys/class/thermal:ro
+      - /run/udev:/run/udev:ro
     environment:
-      #- SSH_AUTH_SOCK=/root/.ssh/agent/s.DNctWd9x9u.agent.YweanNMOPf
+ #     - DOCKER_HOST=unix:///var/run/docker.sock
+      - SSH_AUTH_SOCK=/run/host-services/ssh-agent/ssh-agent
       - TZ=Europe/Berlin
+      - TEMP_SENSOR=cpu_thermal
+    env_file: .env

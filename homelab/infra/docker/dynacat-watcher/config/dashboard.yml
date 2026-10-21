@@ -15,48 +15,10 @@
             - Panonim/dynacat
             - alexta69/metube
             - advplyr/audiobookshelf
-            - mrtoadie/go-velero-manager
             - syncthing/syncthing
             - alam00000/bentopdf
           show-source-icon: true
           frameless: false
-          hide-header: false
-        - type: split-column
-          max-columns: 3
-          widgets:
-            - type: repository
-              repository: mrtoadie/go-velero-manager
-              hide-header: false
-              title-icon: si:go
-              title: velero-manager
-              frameless: true
-              commits-limit: 3
-              issues-limit: 3
-              pull-requests-limit: 3
-            - type: repository
-              repository: mrtoadie/go-check-cert
-              hide-header: false
-              title: cert-checker
-              title-icon: si:go
-              frameless: true
-              commits-limit: 3
-              issues-limit: 3
-              pull-requests-limit: 3
-            - type: repository
-              repository: mrtoadie/kvm-configurator
-              hide-header: false
-              title-icon: si:go
-              frameless: true
-              commits-limit: 3
-              issues-limit: 3
-              pull-requests-limit: 3
-              title: kvm-configurator
-          title-icon: si:github
-          cache: 1h
-          title: Repositories
-          update-interval: 1h
-          frameless: false
-          title-url: https://github.com/mrtoadie/
           hide-header: false
     - size: full
       widgets:
@@ -191,6 +153,49 @@
                   url: https://app.simplelogin.io/dashboard/
                   description: Mail Aliase
           frameless: false
+        - type: split-column
+          max-columns: 2
+          widgets:
+            - type: repository
+              frameless: true
+              repository: mrtoadie/lab
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+            - type: repository
+              repository: mrtoadie/go-velero-manager
+              hide-header: false
+              title-icon: si:go
+              title: velero-manager
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+            - type: repository
+              repository: mrtoadie/go-check-cert
+              hide-header: false
+              title: cert-checker
+              title-icon: si:go
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+            - type: repository
+              repository: mrtoadie/kvm-configurator
+              hide-header: false
+              title-icon: si:go
+              frameless: true
+              commits-limit: 3
+              issues-limit: 3
+              pull-requests-limit: 3
+              title: kvm-configurator
+          title-icon: si:github
+          cache: 1h
+          title: Repositories
+          update-interval: 1h
+          frameless: false
+          title-url: https://github.com/mrtoadie/
+          hide-header: false
     - size: small
       widgets:
         - type: clock
