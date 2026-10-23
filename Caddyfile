@@ -1,0 +1,18 @@
+# Local reverse proxy on watcher (Pi Zero 2W)
+# NOTE: the http:// prefix is REQUIRED - it disables automatic HTTPS,
+# which cannot work for .local names (no public validation possible).
+
+http://watcher.local {
+	encode gzip
+	redir / /dashboard 302
+	reverse_proxy 127.0.0.1:8080
+}
+
+# Cluster services - add as needed
+http://grafana.local {
+	reverse_proxy 192.168.178.210:3000
+}
+
+http://prometheus.local {
+	reverse_proxy 192.168.178.210:9090
+}
