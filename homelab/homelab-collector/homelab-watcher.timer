@@ -1,0 +1,10 @@
+[Unit]
+Description=Watch cluster availability every 5 minutes
+
+[Timer]
+OnCalendar=*:2/5
+RandomizedDelaySec=15
+Persistent=true
+
+[Install]
+WantedBy=timers.target

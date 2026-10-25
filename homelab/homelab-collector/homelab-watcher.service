@@ -1,0 +1,5 @@
+[Service]
+Environment=REPO_DIR=/home/toadie/Projects/mrtoadie.github.io
+Environment=CLUSTER_JSON=data/cluster.json
+WorkingDirectory=/home/toadie/Projects/mrtoadie.github.io
+ExecStart=/home/toadie/Projects/lab/homelab-collector/watch-cluster.sh
