@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-10-25T13:20:25Z",
+  "collector_error": "Kubernetes API Server (https://192.168.178.210:6443/readyz) nicht erreichbar",
+  "nodes": [],
+  "resource_usage": {},
+  "pods": {
+    "total": 0,
+    "running": 0,
+    "pending": 0
+  },
+  "namespaces": null,
+  "deployments": null
+}
