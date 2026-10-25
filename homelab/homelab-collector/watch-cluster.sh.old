@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+#
+# watch-cluster.sh
+#
+# Läuft auf watcher (AUSSERHALB des Clusters) und prüft per TCP, ob die
+# Kubernetes-API erreichbar ist. Braucht KEIN kubectl und KEIN Credential —
+# nur bash, jq, git.
+#
+# ENTSCHEIDEND: Der veröffentlichte Zustand wird aus origin/<branch> gelesen,
+# NICHT aus der lokalen Datei. Die lokale Datei kann durch einen früheren,
+# fehlgeschlagenen Lauf veraltet sein — dann würde das Skript fälschlich
+# annehmen, der Fehler sei schon publiziert.
+#
+# Geschrieben wird nur bei einem echten Zustandswechsel:
+#   Cluster UP   + origin zeigt Fehler  -> Recovery schreiben + pushen
+#   Cluster UP   + origin zeigt keinen  -> nichts tun
+#   Cluster DOWN + origin zeigt keinen  -> Fehler schreiben + pushen
+#   Cluster DOWN + origin zeigt Fehler  -> nichts tun (kein Spam)
+#
+# Reihenfolge: schreiben -> add -> commit -> pull --rebase -> push
+# (erst committen, dann rebasen — so ist der Index beim Pull nie dirty)
+#
+# Aufruf:
+#   cd ~/Projects/mrtoadie.github.io && ~/Projects/lab/homelab/homelab-collector/watch-cluster.sh
+
+set -euo pipefail
+
+# --- Konfiguration ----------------------------------------------------------
+API_HOST="${API_HOST:-192.168.178.210}"
+API_PORT="${API_PORT:-6443}"
+CLUSTER_JSON="${CLUSTER_JSON:-data/cluster.json}"
+REPO_DIR="${REPO_DIR:-$PWD}"
+GIT_BRANCH="${GIT_BRANCH:-main}"
+GIT_PUSH="${GIT_PUSH:-1}"
+TIMEOUT="${TIMEOUT:-5}"
+
+TIMEOUT="${TIMEOUT%s}"
+TIMEOUT="${TIMEOUT%.*}"
+[[ -n "$TIMEOUT" ]] || TIMEOUT=5
+
+log() { printf '%s\n' "$*" >&2; }
+
+# --- Sanity-Checks ----------------------------------------------------------
+if [[ ! -d "$REPO_DIR/.git" ]]; then
+  log "FEHLER: $REPO_DIR ist kein Git-Repository."
+  exit 2
+fi
+
+JSON_PATH="$REPO_DIR/$CLUSTER_JSON"
+
+# --- Zustand aus origin lesen -----------------------------------------------
+fetch_origin() {
+  git -C "$REPO_DIR" fetch origin "$GIT_BRANCH" --quiet 2>/dev/null
+}
+
+# Liefert collector_error aus origin/<branch>. Leer, wenn null/Datei fehlt.
+published_error() {
+  git -C "$REPO_DIR" show "origin/$GIT_BRANCH:$CLUSTER_JSON" 2>/dev/null \
+    | jq -r 'if .collector_error == null then "" else .collector_error end' \
+      2>/dev/null || printf ''
+}
+
+# --- Git --------------------------------------------------------------------
+tree_dirty_after_commit() {
+  ! git -C "$REPO_DIR" diff-index --quiet HEAD -- 2>/dev/null
+}
+
+push_current_state() {
+  if [[ "$GIT_PUSH" != "1" ]]; then
+    log "GIT_PUSH=0 — kein Push"
+    return 0
+  fi
+
+  git -C "$REPO_DIR" add "$CLUSTER_JSON"
+
+  if git -C "$REPO_DIR" diff --cached --quiet; then
+    log "Keine Änderung im Index — nichts zu committen"
+    return 0
+  fi
+
+  git -C "$REPO_DIR" \
+    -c user.name="homelab-watcher" \
+    -c user.email="homelab-watcher@watcher" \
+    commit -m "chore(cluster): state update $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    || { log "FEHLER: commit fehlgeschlagen"; return 1; }
+
+  if tree_dirty_after_commit; then
+    log "WARNUNG: Repo hat weitere uncommittete Änderungen."
+    log "         pull --rebase könnte scheitern — bitte manuell bereinigen."
+  fi
+
+  if ! git -C "$REPO_DIR" pull --rebase origin "$GIT_BRANCH"; then
+    log "FEHLER: pull --rebase fehlgeschlagen (Konflikt?)"
+    git -C "$REPO_DIR" rebase --abort 2>/dev/null || true
+    return 1
+  fi
+
+  if ! git -C "$REPO_DIR" push origin "$GIT_BRANCH"; then
+    log "FEHLER: push abgelehnt — nächster Lauf versucht es erneut"
+    return 1
+  fi
+
+  log "gepusht nach origin/$GIT_BRANCH"
+}
+
+# --- Datei schreiben --------------------------------------------------------
+write_json() {
+  local err_value="$1" tmp
+  mkdir -p "$(dirname "$JSON_PATH")"
+  tmp="$(mktemp)"
+  trap 'rm -f "$tmp"' RETURN
+
+  if [[ -n "$err_value" ]]; then
+    jq -n \
+      --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      --arg err "$err_value" \
+      '{ timestamp: $ts, collector_error: $err, nodes: [],
+         resource_usage: {}, pods: { total: 0, running: 0, pending: 0 },
+         namespaces: null, deployments: null }' >"$tmp"
+  else
+    jq -n \
+      --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      '{ timestamp: $ts, collector_error: null, nodes: [],
+         resource_usage: {}, pods: { total: 0, running: 0, pending: 0 },
+         namespaces: null, deployments: null }' >"$tmp"
+  fi
+
+  mv "$tmp" "$JSON_PATH"
+}
+
+# --- Health-Check (TCP) -----------------------------------------------------
+check_api_health_tcp() {
+  timeout "$TIMEOUT" bash -c "echo >/dev/tcp/$API_HOST/$API_PORT" 2>/dev/null \
+    && return 0
+
+  if command -v nc >/dev/null; then
+    nc -z -w "$TIMEOUT" "$API_HOST" "$API_PORT" 2>/dev/null && return 0
+  fi
+
+  return 1
+}
+
+# --- Main --------------------------------------------------------------------
+log "=== Homelab Cluster Watcher ==="
+log "API: $API_HOST:$API_PORT  |  Timeout: ${TIMEOUT}s  |  Repo: $REPO_DIR"
+
+if ! fetch_origin; then
+  log "WARNUNG: fetch von origin fehlgeschlagen — nutze letzten bekannten Stand"
+fi
+
+pub_err="$(published_error)"
+if [[ -n "$pub_err" ]]; then
+  log "Auf GitHub dokumentiert: Fehler (\"$pub_err\")"
+else
+  log "Auf GitHub dokumentiert: kein Fehler"
+fi
+
+# Gewünschten Zustand bestimmen
+if check_api_health_tcp; then
+  desired=""
+  log "Cluster erreichbar (TCP $API_HOST:$API_PORT)."
+else
+  desired="Kubernetes API Server ($API_HOST:$API_PORT) nicht erreichbar (TCP)"
+  log "FEHLER: Cluster nicht erreichbar auf $API_HOST:$API_PORT"
+fi
+
+# Nur bei echtem Zustandswechsel handeln
+if [[ "$desired" == "$pub_err" ]]; then
+  log "-> Zustand auf GitHub ist bereits korrekt. Nichts zu tun."
+  exit 0
+fi
+
+if [[ -n "$desired" ]]; then
+  log "-> Zustandswechsel: OK -> FEHLER. Schreibe und pushe."
+else
+  log "-> Zustandswechsel: FEHLER -> OK. Schreibe und pushe."
+fi
+
+write_json "$desired"
+push_current_state
+
+exit 0

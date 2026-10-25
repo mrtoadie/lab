@@ -2,101 +2,91 @@
 #
 # watch-cluster.sh
 #
-# Läuft auf watcher (AUSSERHALB des Clusters) und prüft per HTTP, ob die
-# Kubernetes-API erreichbar ist. Braucht KEIN kubectl und KEIN Credential —
-# nur curl, jq, git und optional das CA-Zertifikat (ca.pem).
+# Runs on watcher (OUTSIDE the cluster) and checks via TCP whether the
+# Kubernetes API is reachable. Needs NO kubectl and NO credential —
+# only bash, jq, git.
 #
-# Cluster erreichbar  -> Skript tut nichts. collect.sh im Cluster schreibt die
-#                        echten Daten und entfernt dabei collector_error.
-# Cluster NICHT da    -> Skript schreibt data/cluster.json mit collector_error
-#                        und pusht nach GitHub. Frontend zeigt roten Banner.
+# KEY DESIGN DECISIONS
 #
-# FIXES gegenüber der vorherigen Version:
-#   1. TIMEOUT war "5s" — curl akzeptiert bei --max-time KEIN Suffix, nur
-#      Sekunden mit Dezimalpunkt ("5" oder "2.5"). Das führte zu Exit-Code 2
-#      ("expected a proper numerical parameter") und damit zu einem
-#      Fehlalarm, obwohl der Cluster lief. Jetzt: reine Zahl, plus
-#      defensive Bereinigung falls doch ein "s" in der Variable steht.
-#   2. Kein Fallback mehr bei fehlgeschlagener CA-Verifikation. Jetzt wird
-#      nach einem Fehlschlag mit CA ein zweiter Versuch ohne Verifikation
-#      unternommen (mit Warnung im Log).
-#   3. curl-Exit-Code wird geloggt, damit Fehlalarme künftig sofort
-#      unterscheidbar sind: 2 = Syntaxfehler, 6 = DNS, 7 = Connection refused,
-#      28 = Timeout, 60 = TLS-Verifikation.
+# 1. The published state is read from origin/<branch>, NOT from the local file.
+#    The local file can be stale from an earlier failed run — in that case the
+#    script would wrongly assume the error was already published.
 #
-# Aufruf:
-#   ./watch-cluster.sh
+# 2. NO rebase, NO merge. Both writers (this script and collect.sh on the
+#    cluster) regenerate data/cluster.json from scratch on every run. There is
+#    nothing to merge — only "whose state wins". So the local checkout is
+#    hard-reset to origin, the new content is written on top, committed and
+#    pushed. This makes merge conflicts structurally impossible.
 #
-# Konfiguration per Environment, z.B.:
-#   API_SERVER=https://192.168.178.210:6443 TIMEOUT=3 ./watch-cluster.sh
+# 3. Push is retried. If the other writer pushed between our fetch and our
+#    push, the push is rejected — we simply fetch again and repeat.
+#
+# State transitions handled:
+#   Cluster UP   + origin shows error  -> recovery written + pushed
+#   Cluster UP   + origin shows none   -> nothing to do
+#   Cluster DOWN + origin shows none   -> error written + pushed
+#   Cluster DOWN + origin shows error  -> nothing to do (no spam)
+#
+# Usage:
+#   cd ~/Projects/mrtoadie.github.io && ~/Projects/lab/homelab/homelab-collector/watch-cluster.sh
 
 set -euo pipefail
 
-# --- Konfiguration ----------------------------------------------------------
-API_SERVER="${API_SERVER:-https://192.168.178.210:6443}"
+# --- Configuration ----------------------------------------------------------
+API_HOST="${API_HOST:-192.168.178.210}"
+API_PORT="${API_PORT:-6443}"
 CLUSTER_JSON="${CLUSTER_JSON:-data/cluster.json}"
-STATE_DIR="${STATE_DIR:-$HOME/.local/state/homelab-collector}"
-LAST_ERROR_FILE="$STATE_DIR/last_error_push"
-CA_FILE="${CA_FILE:-$HOME/Projects/lab/homelab/homelab-collector/ca.pem}"
-GIT_BRANCH="${GIT_BRANCH:-main}"
 REPO_DIR="${REPO_DIR:-$PWD}"
+GIT_BRANCH="${GIT_BRANCH:-main}"
 GIT_PUSH="${GIT_PUSH:-1}"
 TIMEOUT="${TIMEOUT:-5}"
-ERROR_COOLDOWN="${ERROR_COOLDOWN:-300}"
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-3}"
 
-# Defensive: falls jemand "5s" setzt, das Suffix entfernen.
+# Defensive: "5s" -> "5", "2.5" -> "2"
 TIMEOUT="${TIMEOUT%s}"
+TIMEOUT="${TIMEOUT%.*}"
+[[ -n "$TIMEOUT" ]] || TIMEOUT=5
 
 log() { printf '%s\n' "$*" >&2; }
 
-# --- Git --------------------------------------------------------------------
-push_if_changed() {
-  if [[ "$GIT_PUSH" != "1" ]]; then
-    log "GIT_PUSH=0 — kein Push"
-    return 0
-  fi
-  if ! command -v git >/dev/null; then
-    log "git nicht gefunden — kein Push"
-    return 0
-  fi
+# --- Sanity checks ----------------------------------------------------------
+if [[ ! -d "$REPO_DIR/.git" ]]; then
+  log "ERROR: $REPO_DIR is not a git repository."
+  log "       Start from the website repo or set REPO_DIR."
+  exit 2
+fi
 
-  git -C "$REPO_DIR" add "$CLUSTER_JSON"
+JSON_PATH="$REPO_DIR/$CLUSTER_JSON"
 
-  if git -C "$REPO_DIR" diff --cached --quiet; then
-    log "keine Aenderung an $CLUSTER_JSON — kein Commit"
-    return 0
-  fi
-
-  if ! git -C "$REPO_DIR" pull --rebase origin "$GIT_BRANCH"; then
-    log "FEHLER: pull --rebase fehlgeschlagen — Push abgebrochen"
+# --- Clear any stuck rebase/merge state -------------------------------------
+for marker in rebase-merge rebase-apply MERGE_HEAD; do
+  if [[ -e "$REPO_DIR/.git/$marker" ]]; then
+    log "Note: found leftover $marker state — cleaning up"
     git -C "$REPO_DIR" rebase --abort 2>/dev/null || true
-    return 1
+    git -C "$REPO_DIR" merge --abort 2>/dev/null || true
+    break
   fi
+done
 
-  git -C "$REPO_DIR" \
-    -c user.name="homelab-watcher" \
-    -c user.email="homelab-watcher@watcher" \
-    commit -m "chore(cluster): error state $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-
-  if ! git -C "$REPO_DIR" push origin "$GIT_BRANCH"; then
-    log "FEHLER: push abgelehnt — versuche es beim naechsten Lauf erneut"
-    return 1
-  fi
-
-  log "gepusht nach origin/$GIT_BRANCH"
+# --- Read published state from origin ---------------------------------------
+fetch_origin() {
+  git -C "$REPO_DIR" fetch origin "$GIT_BRANCH" --quiet 2>/dev/null
 }
 
-# --- Fehlerzustand schreiben -------------------------------------------------
-write_error_file() {
-  local err_msg="$1"
-  local tmp
+published_error() {
+  git -C "$REPO_DIR" show "origin/$GIT_BRANCH:$CLUSTER_JSON" 2>/dev/null \
+    | jq -r 'if .collector_error == null then "" else .collector_error end' \
+      2>/dev/null || printf ''
+}
 
-  mkdir -p "$(dirname "$CLUSTER_JSON")" "$STATE_DIR"
+# --- Content builders -------------------------------------------------------
+# Minimal error payload: no fake data, empty node list.
+apply_error_state() {
+  local msg="$1" tmp
   tmp="$(mktemp)"
-
   jq -n \
     --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-    --arg err "$err_msg" \
+    --arg err "$msg" \
     '{ timestamp: $ts,
        collector_error: $err,
        nodes: [],
@@ -104,91 +94,130 @@ write_error_file() {
        pods: { total: 0, running: 0, pending: 0 },
        namespaces: null,
        deployments: null }' >"$tmp"
-
-  mv "$tmp" "$CLUSTER_JSON"
-  push_if_changed
-
-  date -u +%Y-%m-%dT%H:%M:%SZ >"$LAST_ERROR_FILE"
-  log "Fehlerzustand geschrieben und gepusht: $err_msg"
+  mv "$tmp" "$JSON_PATH"
 }
 
-# --- Health-Check ------------------------------------------------------------
-# /version ist ein anonym zugänglicher Endpunkt (kein Token nötig).
-# /readyz würde 401 liefern, weil es Authentifizierung verlangt.
-curl_exit_hint() {
-  case "$1" in
-    2)  echo "curl-Syntaxfehler (Argument ungültig)" ;;
-    6)  echo "DNS-Auflösung fehlgeschlagen" ;;
-    7)  echo "Verbindung abgelehnt (Host down / Port zu)" ;;
-    28) echo "Timeout" ;;
-    35) echo "TLS-Handshake fehlgeschlagen" ;;
-    60) echo "TLS-Zertifikat nicht verifizierbar" ;;
-    *)  echo "curl-Exit $1" ;;
-  esac
+# Recovery: keep whatever origin has (possibly real node data written by
+# collect.sh in the meantime) and only strip the error flag.
+apply_recovery_state() {
+  local tmp
+  tmp="$(mktemp)"
+  if [[ -f "$JSON_PATH" ]] && jq -e . "$JSON_PATH" >/dev/null 2>&1; then
+    jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      'del(.collector_error, .last_success) | .timestamp = $ts' \
+      "$JSON_PATH" >"$tmp"
+  else
+    jq -n \
+      --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      '{ timestamp: $ts,
+         collector_error: null,
+         nodes: [],
+         resource_usage: {},
+         pods: { total: 0, running: 0, pending: 0 },
+         namespaces: null,
+         deployments: null }' >"$tmp"
+  fi
+  mv "$tmp" "$JSON_PATH"
 }
 
-check_api_health() {
-  local rc=0
+# --- Publish ----------------------------------------------------------------
+# kind: "error" | "recovery"
+publish_state() {
+  local kind="$1" msg="${2:-}" attempt=1
 
-  if [[ -f "$CA_FILE" ]]; then
-    curl -sf --max-time "$TIMEOUT" --cacert "$CA_FILE" \
-      "${API_SERVER}/version" >/dev/null 2>&1 || rc=$?
-
-    if (( rc == 0 )); then
-      return 0
-    fi
-
-    # Fallback: ohne Verifikation erneut versuchen. Deckt den Fall ab, dass
-    # ca.pem nicht zum aktuellen Server-Cert passt (z.B. k3s-Zertifikat
-    # rotiert) — der Cluster ist dann trotzdem erreichbar.
-    log "CA-Check fehlgeschlagen ($(curl_exit_hint "$rc")) — Retry ohne Verifikation"
-    curl -sfk --max-time "$TIMEOUT" \
-      "${API_SERVER}/version" >/dev/null 2>&1 || {
-        rc=$?
-        log "Auch ohne Verifikation fehlgeschlagen: $(curl_exit_hint "$rc")"
-        return 1
-      }
-    log "Erreichbar, aber Zertifikat nicht verifizierbar — ca.pem pruefen"
+  if [[ "$GIT_PUSH" != "1" ]]; then
+    log "GIT_PUSH=0 — no push"
     return 0
   fi
 
-  log "WARNUNG: $CA_FILE fehlt — pruefe ohne Zertifikatsverifikation"
-  curl -sfk --max-time "$TIMEOUT" \
-    "${API_SERVER}/version" >/dev/null 2>&1 || {
-      rc=$?
-      log "Fehlgeschlagen: $(curl_exit_hint "$rc")"
+  while (( attempt <= MAX_ATTEMPTS )); do
+    if ! fetch_origin; then
+      log "ERROR: fetch failed — aborting push"
       return 1
-    }
-  return 0
+    fi
+
+    # Discard any diverging local commits. The file is regenerated on every
+    # run, so local history carries no value — this is what makes conflicts
+    # impossible.
+    git -C "$REPO_DIR" reset --hard -q "origin/$GIT_BRANCH"
+
+    if [[ "$kind" == "error" ]]; then
+      apply_error_state "$msg"
+    else
+      apply_recovery_state
+    fi
+
+    git -C "$REPO_DIR" add "$CLUSTER_JSON"
+
+    if git -C "$REPO_DIR" diff --cached --quiet; then
+      log "State on GitHub is already identical — nothing to do"
+      return 0
+    fi
+
+    git -C "$REPO_DIR" \
+      -c user.name="homelab-watcher" \
+      -c user.email="homelab-watcher@watcher" \
+      commit -q -m "chore(cluster): state update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+    if git -C "$REPO_DIR" push -q origin "$GIT_BRANCH"; then
+      log "pushed to origin/$GIT_BRANCH"
+      return 0
+    fi
+
+    log "Push rejected (attempt $attempt/$MAX_ATTEMPTS) — retrying"
+    attempt=$((attempt + 1))
+  done
+
+  log "ERROR: gave up after $MAX_ATTEMPTS attempts"
+  return 1
 }
 
-# --- Main --------------------------------------------------------------------
+# --- Health check (TCP) -----------------------------------------------------
+check_api_health_tcp() {
+  timeout "$TIMEOUT" bash -c "echo >/dev/tcp/$API_HOST/$API_PORT" 2>/dev/null \
+    && return 0
+
+  if command -v nc >/dev/null; then
+    nc -z -w "$TIMEOUT" "$API_HOST" "$API_PORT" 2>/dev/null && return 0
+  fi
+
+  return 1
+}
+
+# --- Main -------------------------------------------------------------------
 log "=== Homelab Cluster Watcher ==="
-log "API: $API_SERVER  |  Timeout: ${TIMEOUT}s  |  CA: $CA_FILE"
+log "API: $API_HOST:$API_PORT  |  Timeout: ${TIMEOUT}s  |  Repo: $REPO_DIR"
 
-mkdir -p "$STATE_DIR"
+if ! fetch_origin; then
+  log "WARNING: fetch from origin failed — using last known state"
+fi
 
-if check_api_health; then
-  log "Cluster erreichbar (/version -> HTTP 200). Nichts zu tun."
-  # Cooldown zurücksetzen, damit ein späterer Ausfall sofort gemeldet wird.
-  rm -f "$LAST_ERROR_FILE"
+pub_err="$(published_error)"
+if [[ -n "$pub_err" ]]; then
+  log "Published on GitHub: error (\"$pub_err\")"
+else
+  log "Published on GitHub: no error"
+fi
+
+if check_api_health_tcp; then
+  desired=""
+  log "Cluster reachable (TCP $API_HOST:$API_PORT)."
+else
+  desired="Kubernetes API Server ($API_HOST:$API_PORT) unreachable (TCP)"
+  log "ERROR: cluster unreachable on $API_HOST:$API_PORT"
+fi
+
+if [[ "$desired" == "$pub_err" ]]; then
+  log "-> Published state is already correct. Nothing to do."
   exit 0
 fi
 
-log "FEHLER: Cluster antwortet nicht auf ${API_SERVER}/version"
-
-# Nicht spammen: pro Ausfall nur ein Fehler-Commit.
-if [[ -f "$LAST_ERROR_FILE" ]]; then
-  last_err_time="$(cat "$LAST_ERROR_FILE")"
-  now_ts="$(date +%s)"
-  err_ts="$(date -d "$last_err_time" +%s 2>/dev/null || echo 0)"
-  diff_sec=$(( now_ts - err_ts ))
-
-  if (( diff_sec < ERROR_COOLDOWN )); then
-    log "Ausfall bereits vor ${diff_sec}s dokumentiert — kein weiterer Push"
-    exit 1
-  fi
+if [[ -n "$desired" ]]; then
+  log "-> Transition: OK -> ERROR. Writing and pushing."
+  publish_state error "$desired"
+else
+  log "-> Transition: ERROR -> OK. Writing and pushing."
+  publish_state recovery
 fi
 
-write_error_file "Kubernetes API Server (${API_SERVER}/version) nicht erreichbar"
-exit 1
+exit 0
