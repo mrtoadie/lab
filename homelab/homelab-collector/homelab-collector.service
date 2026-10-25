@@ -1,0 +1,15 @@
+[Unit]
+Description=Homelab collector (fetches data, pushes to mrtoadie.github.io)
+
+[Service]
+Type=oneshot
+User=toadie
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+Environment=GIT_PUSH=1
+Environment=CLUSTER_JSON=data/cluster.json
+Environment=REPO_DIR=/home/toadie/Projects/mrtoadie.github.io
+Environment=NODE_SPECS_FILE=/home/toadie/Projects/lab/homelab/node-specs.json
+WorkingDirectory=/home/toadie/Projects/mrtoadie.github.io
+ExecStart=/home/toadie/Projects/lab/homelab/homelab-collector/collect.sh
+StandardOutput=journal
+StandardError=journal
