@@ -39,23 +39,15 @@ SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-n
 #   3. 1-minute load average
 #   4. uptime in seconds
 # NEW (robust):
-CMD_HOSTSTATS=$(cat <<'HEREDOC'
-# Line 1: disk percent (integer only)
-df --output=pcent / 2>/dev/null | awk '/\/$/{gsub(/[^0-9]/,"",$2); print $2+0; exit}' || echo 0
-# Line 2: temperature in millidegrees
-if [[ -f /sys/class/thermal/thermal_zone0/temp ]]; then
-    cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0
-elif command -v vcgencmd &>/dev/null; then
-    vcgencmd measure_temp 2>/dev/null | sed "s/temp=//;s/'C//" | awk '{print int($1*1000)}' || echo 0
-else
-    echo 0
-fi
-# Line 3: 1-min load average
-awk '{print $1}' /proc/loadavg 2>/dev/null || echo 0
-# Line 4: uptime seconds
-awk '{print int($1)}' /proc/uptime 2>/dev/null || echo 0
-HEREDOC
-)
+CMD_HOSTSTATS='disk=$(df --output=pcent / 2>/dev/null | tail -1 | tr -dc "0-9"); echo "$disk"; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
+
+    for host in "${NODES[@]}"; do
+        mapfile -t stats < <(run_on "$host" "$CMD_HOSTSTATS")
+        # Defensive: a node must return exactly 4 lines, otherwise all null
+        [ "${#stats[@]}" -eq 4 ] || stats=("" "" "" "")
+
+        disk_raw="${stats[0]:-}"
+        ...
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 DRY_RUN=0
