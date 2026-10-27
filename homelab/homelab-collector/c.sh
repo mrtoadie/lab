@@ -38,7 +38,24 @@ SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-n
 #   2. raw thermal reading in millidegrees (0 if unavailable)
 #   3. 1-minute load average
 #   4. uptime in seconds
-CMD_HOSTSTATS='df --output=pcent / | tail -1 | tr -dc "0-9"; echo; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
+# NEW (robust):
+CMD_HOSTSTATS=$(cat <<'HEREDOC'
+# Line 1: disk percent (integer only)
+df --output=pcent / 2>/dev/null | awk '/\/$/{gsub(/[^0-9]/,"",$2); print $2+0; exit}' || echo 0
+# Line 2: temperature in millidegrees
+if [[ -f /sys/class/thermal/thermal_zone0/temp ]]; then
+    cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0
+elif command -v vcgencmd &>/dev/null; then
+    vcgencmd measure_temp 2>/dev/null | sed "s/temp=//;s/'C//" | awk '{print int($1*1000)}' || echo 0
+else
+    echo 0
+fi
+# Line 3: 1-min load average
+awk '{print $1}' /proc/loadavg 2>/dev/null || echo 0
+# Line 4: uptime seconds
+awk '{print int($1)}' /proc/uptime 2>/dev/null || echo 0
+HEREDOC
+)
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 DRY_RUN=0
@@ -150,10 +167,11 @@ collect_cluster_data() {
         uptime=$(int_or_null "$uptime_raw")
 
         if is_int "$temp_raw" && [ "$temp_raw" -gt 0 ]; then
-            temp=$(( temp_raw / 1000 ))
-        else
-            temp="null"
-        fi
+    # Use bc or awk for decimal precision
+    temp=$(awk "BEGIN {printf \"%.1f\", $temp_raw/1000}")
+else
+    temp="null"
+fi
 
         mem_mib=$(to_mib "${K_MEM_RAW[$host]:-}")
         cpu_m=$(to_millicores "${K_CPU_CORES[$host]:-}")
