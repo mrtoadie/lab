@@ -38,7 +38,7 @@ SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-n
 #   2. raw thermal reading in millidegrees (0 if unavailable)
 #   3. 1-minute load average
 #   4. uptime in seconds
-CMD_HOSTSTATS='df --output=pcent / | tail -1 | tr -dc "0-9"; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
+CMD_HOSTSTATS='df --output=pcent / | tail -1 | tr -dc "0-9"; echo; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 DRY_RUN=0
