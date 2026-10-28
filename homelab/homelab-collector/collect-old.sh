@@ -38,16 +38,7 @@ SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-n
 #   2. raw thermal reading in millidegrees (0 if unavailable)
 #   3. 1-minute load average
 #   4. uptime in seconds
-# NEW (robust):
-CMD_HOSTSTATS='disk=$(df --output=pcent / 2>/dev/null | tail -1 | tr -dc "0-9"); echo "$disk"; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
-
-    for host in "${NODES[@]}"; do
-        mapfile -t stats < <(run_on "$host" "$CMD_HOSTSTATS")
-        # Defensive: a node must return exactly 4 lines, otherwise all null
-        [ "${#stats[@]}" -eq 4 ] || stats=("" "" "" "")
-
-        disk_raw="${stats[0]:-}"
-        ...
+CMD_HOSTSTATS='df --output=pcent / | tail -1 | tr -dc "0-9"; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 DRY_RUN=0
@@ -129,23 +120,10 @@ collect_cluster_data() {
         K_MEM_PCT["$n"]="${f_mempct%\%}"
     done < <(kubectl top nodes --no-headers 2>/dev/null || true)
 
-    # ---------------- running pods per node ----------------
-    # Single kubectl round trip, grouped with awk. Pending pods without a
-    # node assignment fall through the empty-name guard.
-    declare -A K_PODS
-    while read -r count node; do
-        [ -z "${node:-}" ] && continue
-        K_PODS["$node"]="$count"
-    done < <(kubectl get pods -A \
-                --field-selector=status.phase=Running \
-                -o custom-columns=NODE:.spec.nodeName \
-                --no-headers 2>/dev/null \
-             | awk 'NF { c[$1]++ } END { for (n in c) print c[n], n }')
-
     # ---------------- per-node resource usage ----------------
     local usage_json="{" usep=""
     local host stats disk_raw temp_raw load_raw uptime_raw
-    local disk temp load uptime mem_mib cpu_m pods_n
+    local disk temp load uptime mem_mib cpu_m
 
     for host in "${NODES[@]}"; do
         mapfile -t stats < <(run_on "$host" "$CMD_HOSTSTATS")
@@ -159,15 +137,13 @@ collect_cluster_data() {
         uptime=$(int_or_null "$uptime_raw")
 
         if is_int "$temp_raw" && [ "$temp_raw" -gt 0 ]; then
-    # Use bc or awk for decimal precision
-    temp=$(awk "BEGIN {printf \"%.1f\", $temp_raw/1000}")
-else
-    temp="null"
-fi
+            temp=$(( temp_raw / 1000 ))
+        else
+            temp="null"
+        fi
 
         mem_mib=$(to_mib "${K_MEM_RAW[$host]:-}")
         cpu_m=$(to_millicores "${K_CPU_CORES[$host]:-}")
-        pods_n=$(int_or_null "${K_PODS[$host]:-}")
 
         usage_json+="${usep}\"${host}\":{"
         usage_json+="\"cpu_percent\":$(int_or_null "${K_CPU_PCT[$host]:-}"),"
@@ -177,8 +153,7 @@ fi
         usage_json+="\"disk_percent\":${disk},"
         usage_json+="\"temp_c\":${temp},"
         usage_json+="\"load1\":${load},"
-        usage_json+="\"uptime_s\":${uptime},"
-        usage_json+="\"pods\":${pods_n}"
+        usage_json+="\"uptime_s\":${uptime}"
         usage_json+="}"
         usep=","
     done
