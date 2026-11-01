@@ -39,8 +39,14 @@ SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-n
 #   3. 1-minute load average
 #   4. uptime in seconds
 # NEW (robust):
-CMD_HOSTSTATS='disk=$(df --output=pcent / 2>/dev/null | tail -1 | tr -dc "0-9"); echo "$disk"; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
-
+#CMD_HOSTSTATS='disk=$(df --output=pcent / 2>/dev/null | tail -1 | tr -dc "0-9"); echo "$disk"; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
+CMD_HOSTSTATS='
+  root_disk=$(df --output=pcent / 2>/dev/null | tail -1 | tr -dc "0-9"); echo "$root_disk";
+  usb_disk=$(df --output=pcent /media/toadie/clusterdata 2>/dev/null | tail -1 | tr -dc "0-9" || echo ""); echo "${usb_disk:-null}";
+  cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0;
+  cut -d " " -f1 /proc/loadavg;
+  cut -d. -f1 /proc/uptime
+'
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 DRY_RUN=0
@@ -162,6 +168,9 @@ fi
         mem_mib=$(to_mib "${K_MEM_RAW[$host]:-}")
         cpu_m=$(to_millicores "${K_CPU_CORES[$host]:-}")
         pods_n=$(int_or_null "${K_PODS[$host]:-}")
+disk_root=$(int_or_null "$disk_raw[0]")
+disk_usb=$(int_or_null "$disk_raw[1]")
+temp_raw="${disk_raw[2]:-}"
 
         usage_json+="${usep}\"${host}\":{"
         usage_json+="\"cpu_percent\":$(int_or_null "${K_CPU_PCT[$host]:-}"),"
