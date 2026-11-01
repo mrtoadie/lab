@@ -33,20 +33,16 @@ CONTROL_PLANE="winterfell"
 
 SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new)
 
-# One round trip per node, four lines of output:
-#   1. disk usage of / in percent
-#   2. raw thermal reading in millidegrees (0 if unavailable)
-#   3. 1-minute load average
-#   4. uptime in seconds
-# NEW (robust):
-#CMD_HOSTSTATS='disk=$(df --output=pcent / 2>/dev/null | tail -1 | tr -dc "0-9"); echo "$disk"; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
-CMD_HOSTSTATS='
-  root_disk=$(df --output=pcent / 2>/dev/null | tail -1 | tr -dc "0-9"); echo "$root_disk";
-  usb_disk=$(df --output=pcent /media/toadie/clusterdata 2>/dev/null | tail -1 | tr -dc "0-9" || echo ""); echo "${usb_disk:-null}";
-  cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0;
-  cut -d " " -f1 /proc/loadavg;
-  cut -d. -f1 /proc/uptime
-'
+# One round trip per node, five lines of output:
+#   1. disk usage of / (rootfs) in percent
+#   2. disk usage of the USB-SSD mountpoint in percent, or "null"
+#   3. raw thermal reading in millidegrees (0 if unavailable)
+#   4. 1-minute load average
+#   5. uptime in seconds
+# NOTE: the USB mountpoint is hardcoded in line 2 of the command below —
+# change it there if the mount ever moves. Kept literal on purpose: the
+# quoting of CMD_HOSTSTATS is fragile enough without variable splicing.
+CMD_HOSTSTATS='root_disk=$(df --output=pcent / 2>/dev/null | tail -1 | tr -dc "0-9"); echo "$root_disk"; usb_disk=$(df --output=pcent /media/toadie/clusterdata 2>/dev/null | tail -1 | tr -dc "0-9"); echo "${usb_disk:-null}"; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0; cut -d " " -f1 /proc/loadavg; cut -d. -f1 /proc/uptime'
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 DRY_RUN=0
@@ -129,8 +125,6 @@ collect_cluster_data() {
     done < <(kubectl top nodes --no-headers 2>/dev/null || true)
 
     # ---------------- running pods per node ----------------
-    # Single kubectl round trip, grouped with awk. Pending pods without a
-    # node assignment fall through the empty-name guard.
     declare -A K_PODS
     while read -r count node; do
         [ -z "${node:-}" ] && continue
@@ -142,42 +136,46 @@ collect_cluster_data() {
              | awk 'NF { c[$1]++ } END { for (n in c) print c[n], n }')
 
     # ---------------- per-node resource usage ----------------
+    # CMD_HOSTSTATS returns five lines per host:
+    #   stats[0] rootfs %, stats[1] usb %, stats[2] temp,
+    #   stats[3] load, stats[4] uptime
+    # disk_percent keeps its old meaning (rootfs, feeds the node gauge);
+    # disk_usb is new and feeds the USB-SSD card on the dashboard.
     local usage_json="{" usep=""
-    local host stats disk_raw temp_raw load_raw uptime_raw
-    local disk temp load uptime mem_mib cpu_m pods_n
+    local host stats
+    local disk_root disk_usb temp_raw load_raw uptime_raw
+    local temp load uptime mem_mib cpu_m pods_n
 
     for host in "${NODES[@]}"; do
         mapfile -t stats < <(run_on "$host" "$CMD_HOSTSTATS")
-        [ "${#stats[@]}" -eq 4 ] || stats=("" "" "")
-        disk_raw="${stats[0]:-}"
-        temp_raw="${stats[1]:-}"
-        load_raw="${stats[2]:-}"
-        uptime_raw="${stats[3]:-}"
+        [ "${#stats[@]}" -eq 5 ] || stats=("" "" "" "" "")
 
-        disk=$(int_or_null "$disk_raw")
+        disk_root=$(int_or_null "${stats[0]:-}")
+        disk_usb=$(int_or_null "${stats[1]:-}")
+        temp_raw="${stats[2]:-}"
+        load_raw="${stats[3]:-}"
+        uptime_raw="${stats[4]:-}"
+
         load=$(num_or_null "$load_raw")
         uptime=$(int_or_null "$uptime_raw")
 
         if is_int "$temp_raw" && [ "$temp_raw" -gt 0 ]; then
-    # Use bc or awk for decimal precision
-    temp=$(awk "BEGIN {printf \"%.1f\", $temp_raw/1000}")
-else
-    temp="null"
-fi
+            temp=$(awk "BEGIN {printf \"%.1f\", $temp_raw/1000}")
+        else
+            temp="null"
+        fi
 
         mem_mib=$(to_mib "${K_MEM_RAW[$host]:-}")
         cpu_m=$(to_millicores "${K_CPU_CORES[$host]:-}")
         pods_n=$(int_or_null "${K_PODS[$host]:-}")
-disk_root=$(int_or_null "$disk_raw[0]")
-disk_usb=$(int_or_null "$disk_raw[1]")
-temp_raw="${disk_raw[2]:-}"
 
         usage_json+="${usep}\"${host}\":{"
         usage_json+="\"cpu_percent\":$(int_or_null "${K_CPU_PCT[$host]:-}"),"
         usage_json+="\"cpu_millicores\":${cpu_m},"
         usage_json+="\"mem_percent\":$(int_or_null "${K_MEM_PCT[$host]:-}"),"
         usage_json+="\"mem_mib\":${mem_mib},"
-        usage_json+="\"disk_percent\":${disk},"
+        usage_json+="\"disk_percent\":${disk_root},"
+        usage_json+="\"disk_usb\":${disk_usb},"
         usage_json+="\"temp_c\":${temp},"
         usage_json+="\"load1\":${load},"
         usage_json+="\"uptime_s\":${uptime},"
