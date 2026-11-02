@@ -96,20 +96,30 @@ to_millicores() {
 collect_cluster_data() {
     log "Collecting cluster metrics…"
 
-    # ---------------- nodes: name / role / status / version ----------------
-    local nodes_json="[" sep="" name status version role
+        # ---------------- nodes: name / role / status / version / age ----------------
+    local nodes_json="[" sep="" name status version role creation_ts age_days age
     while IFS= read -r line; do
         name=$(awk '{print $1}' <<<"$line")
         status=$(awk '{print $2}' <<<"$line")
         version=$(awk '{print $3}' <<<"$line")
+        creation_ts=$(awk '{print $4}' <<<"$line")
         [ -z "$name" ] && continue
 
         if [ "$name" = "$CONTROL_PLANE" ]; then role="control-plane"; else role="worker"; fi
 
-        nodes_json+="${sep}{\"name\":\"${name}\",\"role\":\"${role}\",\"status\":\"${status}\",\"version\":\"${version}\"}"
+        # creationTimestamp ist ISO 8601 (z.B. 2025-06-30T08:14:11Z)
+        # -> Alter in ganzen Tagen wie bei "kubectl get nodes" (125d)
+        if [ -n "$creation_ts" ] && date -d "$creation_ts" +%s >/dev/null 2>&1; then
+            age_days=$(( ($(date +%s) - $(date -d "$creation_ts" +%s)) / 86400 ))
+            age="${age_days}d"
+        else
+            age="null"
+        fi
+
+        nodes_json+="${sep}{\"name\":\"${name}\",\"role\":\"${role}\",\"status\":\"${status}\",\"version\":\"${version}\",\"age\":\"${age}\"}"
         sep=","
     done < <(kubectl get nodes \
-                -o custom-columns=NAME:.metadata.name,STATUS:.status.conditions[-1].status,VERSION:.status.nodeInfo.kubeletVersion \
+                -o custom-columns=NAME:.metadata.name,STATUS:.status.conditions[-1].status,VERSION:.status.nodeInfo.kubeletVersion,CREATED:.metadata.creationTimestamp \
                 --no-headers 2>/dev/null || true)
     nodes_json+="]"
 
