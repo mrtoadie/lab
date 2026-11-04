@@ -42,6 +42,10 @@ declare -A ICONS=(
     [worker]="carbon:kubernetes-worker-node"
     [control]="carbon:kubernetes-control-plane-node"
     [kubernetes]="carbon:logo-kubernetes"
+    [go]="fa6-brands:golang"
+    [nixos]="devicon-plain:nixos"
+    [arch]="fa7-brands:arch-linux"
+    [bash]="devicon:bash"
 )
 
 mkdir -p "$OUT_DIR"
