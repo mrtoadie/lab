@@ -1,0 +1,15 @@
+[Unit]
+Description=Run watcher heartbeat every 5 minutes
+
+[Timer]
+# First run 2 minutes after boot, then every 5 minutes
+OnBootSec=2min
+OnUnitActiveSec=5min
+
+# Allow a little slack so it doesn't wake the CPU at the exact same tick
+AccuracySec=30s
+
+Unit=watcher-heartbeat.service
+
+[Install]
+WantedBy=timers.target

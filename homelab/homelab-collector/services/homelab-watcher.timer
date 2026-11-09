@@ -2,8 +2,7 @@
 Description=Watch cluster availability every 5 minutes
 
 [Timer]
-OnCalendar=*:2/5
-RandomizedDelaySec=15
+OnCalendar=*:0/15
 Persistent=true
 
 [Install]

@@ -1,0 +1,18 @@
+[Unit]
+Description=Watcher heartbeat (push liveness to GitHub)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=toadie
+Group=toadie
+
+# systemd sets neither of these — the script needs both.
+Environment=HOME=/home/toadie
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+ExecStart=/home/toadie/Projects/lab/homelab/homelab-collector/watcher-heartbeat.sh
+
+# No privilege escalation needed for a curl+jq script
+NoNewPrivileges=yes
