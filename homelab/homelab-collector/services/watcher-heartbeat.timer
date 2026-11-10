@@ -1,11 +1,12 @@
 [Unit]
-Description=Run watcher heartbeat every 5 minutes
+Description=Run watcher heartbeat every 15 minutes
 
 [Timer]
 # First run 2 minutes after boot, then every 5 minutes
-OnBootSec=2min
-OnUnitActiveSec=5min
-
+#OnBootSec=2min
+#OnUnitActiveSec=5min
+ OnBootSec=2min
+ OnUnitActiveSec=15min
 # Allow a little slack so it doesn't wake the CPU at the exact same tick
 AccuracySec=30s
 
