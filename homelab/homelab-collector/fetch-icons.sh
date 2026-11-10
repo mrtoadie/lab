@@ -46,6 +46,8 @@ declare -A ICONS=(
     [nixos]="devicon-plain:nixos"
     [arch]="fa7-brands:arch-linux"
     [bash]="devicon:bash"
+    [raspberry]="cib:raspberry-pi"
+    [raspberrypi]="cbi:raspberry-pi"
 )
 
 mkdir -p "$OUT_DIR"
