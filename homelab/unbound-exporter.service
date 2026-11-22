@@ -1,0 +1,17 @@
+[Unit]
+Description=Prometheus exporter for Unbound DNS
+After=network.target unbound.service
+
+[Service]
+ExecStart=/usr/local/bin/unbound_exporter \
+  --unbound.host=127.0.0.1:8953 \
+  --unbound.ca=/etc/unbound/unbound_server.pem \
+  --unbound.cert=/etc/unbound/unbound_control.pem \
+  --unbound.key=/etc/unbound/unbound_control.key \
+  --web.listen-address=0.0.0.0:9160
+Restart=on-failure
+# root, damit die root:root-geschützten Zertifikate lesbar sind
+User=root
+
+[Install]
+WantedBy=multi-user.target
