@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: workload-quota
+  namespace: audiobookshelf
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 3Gi
+    limits.cpu: "4"
+    limits.memory: 6Gi
+    pods: "20"
+    persistentvolumeclaims: "10"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+  namespace: audiobookshelf
+spec:
+  limits:
+    - type: Container
+      default: # Limits, if Pod does not set any
+        cpu: "500m"
+        memory: 512Mi
+      defaultRequest: # Requests, if the pod does not set any
+        cpu: "100m"
+        memory: 256Mi

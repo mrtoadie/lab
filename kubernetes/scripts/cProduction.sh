@@ -3,7 +3,7 @@ set -uo pipefail
 
 ###############################################################################
 # KUBERNETES PRODUCTION READINESS CHECK SCRIPT
-# Author: toadie
+# Author: https://github.com/mrtoadie
 # Description: Comprehensive cluster health and production readiness assessment
 ###############################################################################
 
@@ -60,11 +60,11 @@ function ClusterInfo {
   print_header_second "CLUSTER INFOS"
   echo -e "${DIM}Context:${RESET} $(kubectl config current-context 2>/dev/null)"
   echo -e "${DIM}K8s Version:${RESET} $(kubectl version 2>/dev/null | grep Server | awk '{print $3}' || echo "unknown")"
-  
+
   # Initialize global namespace counter early (needed by other functions)
   total_ns=$(kubectl get namespaces --no-headers 2>/dev/null | wc -l)
   total_ns=$(clean_number "$total_ns")
-  
+
   echo -e "${DIM}Namespaces:${RESET} $total_ns"
   echo -e "${DIM}Nodes:${RESET} $(kubectl get nodes --no-headers 2>/dev/null | wc -l)"
   echo -e "${DIM}Pods Total:${RESET} $(kubectl get pods --all-namespaces --no-headers 2>/dev/null | wc -l)"
@@ -79,7 +79,7 @@ function HelmInfo {
     local helm_ver
     helm_ver=$(helm version --short 2>/dev/null || echo "unknown")
     success "Helm Client: $helm_ver"
-    
+
     local repo_count
     repo_count=$(helm repo list 2>/dev/null | tail -n +2 | wc -l || echo "0")
     info "Helm Repositories: $repo_count"
@@ -96,7 +96,7 @@ function ControlPlaneHealth {
 
   local component status etcd_endpoint etcd_health
   local components=("kube-apiserver" "kube-controller-manager" "kube-scheduler" "etcd")
-  
+
   for component in "${components[@]}"; do
     status=$(kubectl get pods -n kube-system --field-selector metadata.name~"$component" --no-headers 2>/dev/null | grep -v Running | wc -l)
     status=$(clean_number "$status")
@@ -159,14 +159,14 @@ function CertificateExpiration {
   while IFS='|' read -r ns name cert_data; do
     if [ -n "$cert_data" ] && [ "$cert_data" != "null" ]; then
       end_date=$(echo "$cert_data" | base64 -d 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
-      
+
       if [ -n "$end_date" ]; then
         expiry_epoch=$(date -d "$end_date" +%s 2>/dev/null)
         current_epoch=$(date +%s)
-        
+
         if [ -n "$expiry_epoch" ]; then
           days_until=$(( (expiry_epoch - current_epoch) / 86400 ))
-          
+
           if [ "$days_until" -lt 30 ] && [ "$days_until" -gt 0 ]; then
             warning_certs="${warning_certs}${ns}/${name} ($days_until days)\n"
           elif [ "$days_until" -le 0 ]; then
@@ -196,7 +196,7 @@ function CertificateExpiration {
 ###############################################################################
 function ResourceQuotasLimits {
   print_header_second "RESOURCE QUOTAS & LIMIT RANGES"
-  
+
   local ns quota_count limit_range_count q used hard
   quota_total=0  # Initialize counter
 
@@ -347,7 +347,7 @@ function ConfigRBAC {
 
   local cluster_admin_bindings sa_tokens
   cluster_admin_bindings=$(kubectl get clusterrolebindings -o jsonpath='{range .items[?(@.roleRef.name=="cluster-admin")]}{.subjects[*].name}{"\n"}{end}' 2>/dev/null)
-  
+
   if [ -n "$cluster_admin_bindings" ]; then
     warn "Service accounts with cluster-admin access:"
     echo -e "$cluster_admin_bindings" | sed 's/^/  /'
@@ -371,7 +371,7 @@ function PODDisruptionBudgets {
 
   pdb_count=$(kubectl get poddisruptionbudgets --all-namespaces --no-headers 2>/dev/null | wc -l)
   pdb_count=$(clean_number "$pdb_count")
-  
+
   local deployments_with_pdb
   deployments_with_pdb=$(kubectl get pdb --all-namespaces -o jsonpath='{.items[*].spec.selector.matchLabels.app}' 2>/dev/null | tr ' ' '\n' | sort -u | wc -l)
   deployments_with_pdb=$(clean_number "$deployments_with_pdb")
@@ -428,7 +428,7 @@ function StorageCheck {
   sc_count=$(kubectl get storageclasses --no-headers 2>/dev/null | wc -l)
   sc_count=$(clean_number "$sc_count")
   default_sc=$(kubectl get storageclass -o jsonpath='{.items[?(@.annotations.storageclass\.kubernetes\.io/is-default-class=="true")].metadata.name}' 2>/dev/null)
-  
+
   info "StorageClasses: $sc_count"
   [ -n "$default_sc" ] && success "Default SC: $default_sc" || warn "No Default StorageClass"
 
@@ -486,12 +486,12 @@ function BackupStatus {
 
   if [ "$velero_deployed" -gt 0 ]; then
     success "Velero Backup installed"
-    
+
     # Exclude header line with tail -n +2
     local backups_scheduled backups_non_scheduled
     backups_scheduled=$(velero schedule get 2>/dev/null | tail -n +2 | grep -c . || echo "0")
     backups_non_scheduled=$(velero backup get 2>/dev/null | tail -n +2 | grep -c . || echo "0")
-    
+
     info "Scheduled Backups: $backups_scheduled"
     info "Manual/Non-Scheduled Backups: $backups_non_scheduled"
   else
@@ -554,7 +554,7 @@ function GitOps {
 
   argocd_installed=$(kubectl get namespace argocd --no-headers 2>/dev/null | wc -l)
   argocd_installed=$(clean_number "$argocd_installed")
-  
+
   if [ "$argocd_installed" -gt 0 ]; then
     success "ArgoCD GitOps installed"
     local apps_sync
@@ -567,17 +567,17 @@ function GitOps {
 
   flux_installed=$(kubectl get namespace flux-system --no-headers 2>/dev/null | wc -l)
   flux_installed=$(clean_number "$flux_installed")
-  
+
   if [ "$flux_installed" -gt 0 ]; then
     success "Flux CD installed"
-    
+
     if kubectl api-resources 2>/dev/null | grep -q "helmrelease"; then
       local hr_count
       hr_count=$(kubectl get helmrelease --all-namespaces --no-headers 2>/dev/null | wc -l)
       hr_count=$(clean_number "$hr_count")
       [ "$hr_count" -gt 0 ] && info "HelmReleases: $hr_count"
     fi
-    
+
     if kubectl api-resources 2>/dev/null | grep -q "kustomization"; then
       local ku_count
       ku_count=$(kubectl get kustomization --all-namespaces --no-headers 2>/dev/null | wc -l)
@@ -646,7 +646,7 @@ function Security {
     psa=$(kubectl get namespace "$ns" -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}' 2>/dev/null || echo "")
     [ -n "$psa" ] && admission_labeled=$((admission_labeled + 1))
   done
-  
+
   info "PSA labeled namespaces: $admission_labeled/$total_ns"
 }
 
@@ -734,7 +734,7 @@ function Score {
 
   echo -e "${BOLD}Score: ${score_color}${score}%${RESET} ($passed/$total_checks checks passed)"
   echo ""
-  
+
   # Detailed breakdown
   echo -e "${DIM}Breakdown:${RESET}"
   echo -e "${DIM}  Nodes Ready:${RESET} $( [ "$ready_nodes" -eq "$total_nodes" ] && echo "Yes" || echo "No" )"
@@ -745,7 +745,7 @@ function Score {
   echo -e "${DIM}  NetworkPolicies (≥5):${RESET} $np_count"
   echo -e "${DIM}  PSA Labeled:${RESET} $admission_labeled/$total_ns"
   echo -e "${DIM}  Resource Quotas:${RESET} $quota_total"
-  
+
   echo ""
   echo -e "${DIM}Cluster Production Check completed: $(date '+%Y-%m-%d %H:%M:%S')${RESET}"
 }

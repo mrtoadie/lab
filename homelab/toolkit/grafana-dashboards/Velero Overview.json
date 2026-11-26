@@ -1,0 +1,2229 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "ozk-vlr-mon",
+    "namespace": "default",
+    "uid": "096316d1-ab24-4771-a668-119080697528",
+    "resourceVersion": "1786205022638006",
+    "generation": 1,
+    "creationTimestamp": "2026-08-08T16:03:42Z",
+    "labels": {
+      "grafana.app/deprecatedInternalID": "954554156892160"
+    },
+    "annotations": {
+      "grafana.app/createdBy": "user:fftaw2rz41r7kc",
+      "grafana.app/saved-from-ui": "Grafana v13.1.1 (e784b7782a)"
+    }
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "datasource",
+            "version": "v0",
+            "datasource": {
+              "name": "grafana"
+            },
+            "spec": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            }
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true,
+          "legacyOptions": {
+            "type": "dashboard"
+          }
+        }
+      }
+    ],
+    "cursorSync": "Crosshair",
+    "description": "Stats for Velero backups",
+    "editable": false,
+    "elements": {
+      "panel-18": {
+        "kind": "Panel",
+        "spec": {
+          "id": 18,
+          "title": "Backup Size per Schedule",
+          "description": "If your Storage component creates the Volume-Snapshots and not Velero, for example with Longhorn, then this will not displayed in the panel.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "avg by (schedule) (avg_over_time(velero_backup_tarball_size_bytes{schedule=~\"$schedule\"}[15m]))",
+                        "legendFormat": "{{schedule}}",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "avg_over_time(velero_backup_tarball_size_bytes{schedule!~\".+\"}[15m])",
+                        "legendFormat": "Non Scheduled",
+                        "range": true
+                      }
+                    },
+                    "refId": "F",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "min",
+                    "mean",
+                    "max",
+                    "lastNotNull"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "smooth",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "id": 2,
+          "title": "Total Backup Count",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "expr": "sum(velero_backup_total)",
+                        "legendFormat": "Backup Total"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "velero_backup_active_total{schedule=~\"$schedule\"}\r\n#missing metric (https://github.com/vmware-tanzu/velero/issues/2254)",
+                        "legendFormat": "Backup {{schedule}}",
+                        "range": true
+                      }
+                    },
+                    "refId": "D",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-20": {
+        "kind": "Panel",
+        "spec": {
+          "id": 20,
+          "title": "Total Restore Count",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(velero_restore_total)",
+                        "legendFormat": "Restore Total",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-22": {
+        "kind": "Panel",
+        "spec": {
+          "id": 22,
+          "title": "Backup Success Rate",
+          "description": "The Success Rate is lower when a Backup is running.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(velero_backup_success_total{schedule=~\"$schedule\"}) / sum(velero_backup_attempt_total{schedule=~\"$schedule\"})",
+                        "format": "time_series",
+                        "intervalFactor": 1,
+                        "legendFormat": "",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "maxDataPoints": 100
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "gauge",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "percentunit",
+                  "min": 0,
+                  "max": 100,
+                  "mappings": [
+                    {
+                      "type": "special",
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      }
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "#d44a3a"
+                      },
+                      {
+                        "value": 0.9,
+                        "color": "rgba(237, 129, 40, 0.89)"
+                      },
+                      {
+                        "value": 0.99,
+                        "color": "#299c46"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-24": {
+        "kind": "Panel",
+        "spec": {
+          "id": 24,
+          "title": "Backup Success Total",
+          "description": "The sum of one-off backup and schedule backup success total ",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "velero_backup_total",
+                        "format": "time_series",
+                        "instant": true,
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": ""
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "maxDataPoints": 100
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "min": 0,
+                  "max": 100,
+                  "mappings": [
+                    {
+                      "type": "special",
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      }
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "#d44a3a"
+                      },
+                      {
+                        "value": 0.95,
+                        "color": "rgba(237, 129, 40, 0.89)"
+                      },
+                      {
+                        "value": 0.99,
+                        "color": "#299c46"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-26": {
+        "kind": "Panel",
+        "spec": {
+          "id": 26,
+          "title": "Backup Deletion Success Rate",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "sum(velero_backup_deletion_success_total{schedule=~\"$schedule\"}) / sum(velero_backup_deletion_attempt_total{schedule=~\"$schedule\"})",
+                        "format": "time_series",
+                        "instant": false,
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": ""
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "maxDataPoints": 100
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "gauge",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "percentunit",
+                  "min": 0,
+                  "max": 100,
+                  "mappings": [
+                    {
+                      "type": "special",
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      }
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "#d44a3a"
+                      },
+                      {
+                        "value": 0.95,
+                        "color": "rgba(237, 129, 40, 0.89)"
+                      },
+                      {
+                        "value": 0.99,
+                        "color": "#299c46"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-28": {
+        "kind": "Panel",
+        "spec": {
+          "id": 28,
+          "title": "Volume Snapshot Success Rate",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "sum(velero_volume_snapshot_success_total{schedule=~\"$schedule\"}) / sum(velero_volume_snapshot_attempt_total{schedule=~\"$schedule\"})\n",
+                        "format": "time_series",
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": ""
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "maxDataPoints": 100
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "gauge",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "percentunit",
+                  "min": 0,
+                  "max": 100,
+                  "mappings": [
+                    {
+                      "type": "special",
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      }
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "#d44a3a"
+                      },
+                      {
+                        "value": 0.95,
+                        "color": "rgba(237, 129, 40, 0.89)"
+                      },
+                      {
+                        "value": 0.99,
+                        "color": "#299c46"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-30": {
+        "kind": "Panel",
+        "spec": {
+          "id": 30,
+          "title": "Hours since last Backup",
+          "description": "for schedule backup use only",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "(time() - velero_backup_last_successful_timestamp{schedule!=\"\"}) / 60 / 60",
+                        "instant": true,
+                        "interval": "",
+                        "legendFormat": "{{schedule}}"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "reduce",
+                  "spec": {
+                    "options": {
+                      "includeTimeField": false,
+                      "labelsToFields": false,
+                      "reducers": [
+                        "lastNotNull"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "organize",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "Field": "Schedule",
+                        "Last *": "Hours since last Backup"
+                      }
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "footer": {
+                  "countRows": false,
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "dark-green"
+                      },
+                      {
+                        "value": 24,
+                        "color": "dark-orange"
+                      },
+                      {
+                        "value": 48,
+                        "color": "dark-red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "mode": "basic",
+                      "type": "color-background"
+                    },
+                    "inspect": false
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Hours since last Backup"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.align",
+                        "value": "left"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-32": {
+        "kind": "Panel",
+        "spec": {
+          "id": 32,
+          "title": "Backup Time Heatmap",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "sum(increase(velero_backup_duration_seconds_bucket{schedule=~\"$schedule\",le!=\"+Inf\"}[1h])) by (le)",
+                        "format": "heatmap",
+                        "interval": "",
+                        "legendFormat": "{{le}}",
+                        "range": true
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "heatmap",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "calculate": false,
+                "calculation": {},
+                "cellGap": 2,
+                "cellValues": {},
+                "color": {
+                  "exponent": 0.5,
+                  "fill": "#1F60C4",
+                  "mode": "scheme",
+                  "reverse": false,
+                  "scale": "exponential",
+                  "scheme": "Spectral",
+                  "steps": 128
+                },
+                "exemplars": {
+                  "color": "rgba(255,0,255,0.7)"
+                },
+                "filterValues": {
+                  "le": 1e-9
+                },
+                "legend": {
+                  "show": true
+                },
+                "rowsFrame": {
+                  "layout": "auto"
+                },
+                "showValue": "never",
+                "tooltip": {
+                  "mode": "single",
+                  "showColorScale": false,
+                  "yHistogram": true
+                },
+                "yAxis": {
+                  "axisPlacement": "left",
+                  "reverse": false,
+                  "unit": "s"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "scaleDistribution": {
+                      "type": "linear"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-34": {
+        "kind": "Panel",
+        "spec": {
+          "id": 34,
+          "title": "Restore per hour",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "round(sum(increase(velero_restore_success_total{schedule=~\"$schedule\"}[1h])))",
+                        "format": "time_series",
+                        "instant": false,
+                        "interval": "",
+                        "legendFormat": "Restore success"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "round(sum(increase(velero_restore_failed_total{schedule=~\"$schedule\"}[1h])))",
+                        "interval": "",
+                        "legendFormat": "Restore failure"
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "round(sum(increase(velero_restore_validation_failed_total{schedule=~\"$schedule\"}[1h])))",
+                        "interval": "",
+                        "legendFormat": "Restore validation failure"
+                      }
+                    },
+                    "refId": "C",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "round(sum(increase(velero_restore_partial_failure_total{schedule=~\"$schedule\"}[1h])))",
+                        "interval": "",
+                        "legendFormat": "Restore partial failure"
+                      }
+                    },
+                    "refId": "D",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "max",
+                    "lastNotNull"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 100,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "stepAfter",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-36": {
+        "kind": "Panel",
+        "spec": {
+          "id": 36,
+          "title": "Restore Success Rate",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "sum(velero_restore_success_total{schedule=~\"$schedule\"}) / sum(velero_restore_attempt_total{schedule=~\"$schedule\"})",
+                        "format": "time_series",
+                        "instant": false,
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": ""
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "maxDataPoints": 100
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "gauge",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "percentunit",
+                  "min": 0,
+                  "max": 100,
+                  "mappings": [
+                    {
+                      "type": "special",
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      }
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "#d44a3a"
+                      },
+                      {
+                        "value": 0.95,
+                        "color": "rgba(237, 129, 40, 0.89)"
+                      },
+                      {
+                        "value": 0.99,
+                        "color": "#299c46"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-38": {
+        "kind": "Panel",
+        "spec": {
+          "id": 38,
+          "title": "Restore Success Total",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "velero_restore_total",
+                        "format": "time_series",
+                        "instant": true,
+                        "interval": "",
+                        "intervalFactor": 1,
+                        "legendFormat": ""
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "maxDataPoints": 100
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "min": 0,
+                  "max": 100,
+                  "mappings": [
+                    {
+                      "type": "special",
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      }
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "#d44a3a"
+                      },
+                      {
+                        "value": 0.95,
+                        "color": "rgba(237, 129, 40, 0.89)"
+                      },
+                      {
+                        "value": 0.99,
+                        "color": "#299c46"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "noValue": "0"
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-42": {
+        "kind": "Panel",
+        "spec": {
+          "id": 42,
+          "title": "CSI per Hour",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "round(sum(increase(velero_csi_snapshot_attempt_total{schedule=~\"$schedule\", backupName=~\"$csi_backup_name\"}[1h])))",
+                        "format": "time_series",
+                        "instant": false,
+                        "interval": "",
+                        "legendFormat": "CSI Snapshot attempt"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "round(sum(increase(velero_csi_snapshot_success_total{schedule=~\"$schedule\", backupName=~\"$csi_backup_name\"}[1h])))",
+                        "interval": "",
+                        "legendFormat": "CSI Snapshot success"
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "exemplar": false,
+                        "expr": "round(sum(increase(velero_csi_snapshot_failure_total{schedule=~\"$schedule\", backupName=~\"$csi_backup_name\"}[1h])))",
+                        "interval": "",
+                        "legendFormat": "CSI Snapshot failure"
+                      }
+                    },
+                    "refId": "C",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "9.1.7",
+            "spec": {
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "max",
+                    "lastNotNull"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 100,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "stepAfter",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "id": 8,
+          "title": "Backups per Hour",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "expr": "sum(increase(velero_backup_success_total{schedule=~\"$schedule\"}[1h])) > 0",
+                        "format": "time_series",
+                        "instant": false,
+                        "interval": "",
+                        "legendFormat": "Backup success"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "expr": "sum(increase(velero_backup_failure_total{schedule=~\"$schedule\"}[1h])) > 0",
+                        "legendFormat": "Backup failure"
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "expr": "sum(increase(velero_backup_partial_failure_total{schedule=~\"$schedule\"}[1h])) > 0",
+                        "legendFormat": "Backup partial failure"
+                      }
+                    },
+                    "refId": "C",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "expr": "sum(increase(velero_backup_deletion_success_total{schedule=~\"$schedule\"}[1h])) > 0",
+                        "legendFormat": "Backup deletion success"
+                      }
+                    },
+                    "refId": "D",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "prometheus"
+                      },
+                      "spec": {
+                        "expr": "sum(increase(velero_backup_deletion_failure_total{schedule=~\"$schedule\"}[1h])) > 0",
+                        "legendFormat": "Backup deletion failure"
+                      }
+                    },
+                    "refId": "E",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "12.0.2",
+            "spec": {
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "max",
+                    "lastNotNull"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "decimals": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": null,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 100,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "stepAfter",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Backup deletion success"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Backup partial failure"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "orange",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "RowsLayout",
+      "spec": {
+        "rows": [
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Backup",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 4,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-24"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 4,
+                        "y": 0,
+                        "width": 4,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-22"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 8,
+                        "y": 0,
+                        "width": 4,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-26"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 12,
+                        "y": 0,
+                        "width": 4,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-28"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 16,
+                        "y": 0,
+                        "width": 8,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-30"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 8,
+                        "width": 12,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-2"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 12,
+                        "y": 8,
+                        "width": 12,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-8"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 16,
+                        "width": 24,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-32"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 24,
+                        "width": 24,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-18"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Restore",
+              "collapse": true,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 4,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-38"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 4,
+                        "y": 0,
+                        "width": 4,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-36"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 8,
+                        "y": 0,
+                        "width": 16,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-34"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 8,
+                        "width": 24,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-20"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "CSI",
+              "collapse": true,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 16,
+                        "width": 24,
+                        "height": 9,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-42"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "velero",
+      "backup"
+    ],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "now-2d",
+      "to": "now",
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "Velero Overview",
+    "variables": [
+      {
+        "kind": "DatasourceVariable",
+        "spec": {
+          "name": "datasource",
+          "pluginId": "prometheus",
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "current": {
+            "text": "",
+            "value": ""
+          },
+          "options": [],
+          "multi": false,
+          "includeAll": false,
+          "label": "Datasource",
+          "hide": "dontHide",
+          "skipUrlSync": false,
+          "allowCustomValue": true
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "name": "schedule",
+          "current": {
+            "text": "",
+            "value": ""
+          },
+          "label": "Schedule",
+          "hide": "dontHide",
+          "refresh": "onDashboardLoad",
+          "skipUrlSync": false,
+          "query": {
+            "kind": "DataQuery",
+            "group": "prometheus",
+            "version": "v0",
+            "datasource": {
+              "name": "prometheus"
+            },
+            "spec": {
+              "query": "label_values(velero_backup_attempt_total,schedule)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            }
+          },
+          "regex": "",
+          "sort": "alphabeticalAsc",
+          "definition": "label_values(velero_backup_attempt_total,schedule)",
+          "options": [],
+          "multi": true,
+          "includeAll": true,
+          "allowCustomValue": true
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "name": "csi_backup_name",
+          "current": {
+            "text": "",
+            "value": ""
+          },
+          "label": "CSI Backup Name",
+          "hide": "dontHide",
+          "refresh": "onDashboardLoad",
+          "skipUrlSync": false,
+          "query": {
+            "kind": "DataQuery",
+            "group": "",
+            "version": "v0",
+            "datasource": {
+              "name": "$datasource"
+            },
+            "spec": {
+              "query": "label_values(velero_csi_snapshot_attempt_total{schedule=~\"$schedule\"},backupName)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            }
+          },
+          "regex": "",
+          "sort": "alphabeticalAsc",
+          "definition": "label_values(velero_csi_snapshot_attempt_total{schedule=~\"$schedule\"},backupName)",
+          "options": [],
+          "multi": true,
+          "includeAll": true,
+          "allowCustomValue": true
+        }
+      }
+    ]
+  }
+}

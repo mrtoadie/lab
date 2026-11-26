@@ -1,0 +1,7 @@
+# prometheus-additional.yaml
+# kubectl create secret generic additional-scrape-configs \
+#  --from-file=prometheus-additional.yaml -n monitoring --dry-run=client -o yaml | kubectl apply -f -
+
+- job_name: caddy-watcher
+  static_configs:
+    - targets: ['192.168.178.199:2019']

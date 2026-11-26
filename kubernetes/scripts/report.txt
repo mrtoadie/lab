@@ -1,0 +1,190 @@
+
+| CLUSTER INFOS 
+Context: default
+K8s Version: v1.36.3+k3s1
+Namespaces: 11
+Nodes: 4
+Pods Total: 27
+Deployments: 18
+CNI: unknown
+Allocatable (per node):
+  winterfell   4     8007400Ki
+  worker01     4     927380Ki
+  worker02     4     927380Ki
+  worker03     4     1888912Ki
+✓ Helm Client: v4.3.0+gbec5b06
+Helm Repositories: 7
+
+| CONTROL PLANE COMPONENTS 
+✓ etcd: Healthy
+scheduler: not reported by /readyz (not an error)
+controller-manager: not reported by /readyz (not an error)
+
+| CERTIFICATES & TLS 
+API Server Certificate cannot be verified (kubeadm/cert-manager or no root access)
+TLS Secrets found: 5
+
+| STORAGE STATUS 
+StorageClasses: 2
+⚠ No Default StorageClass
+PVs: Total=14 | Available=0 | Bound=7 | Failed=0
+PVCs: Total=7 | Pending=0
+Node Memory Usage (via metrics-server):
+  ├─ winterfell: 14%
+  ├─ worker01: 1%
+  ├─ worker02: 2%
+  ├─ worker03: 2%
+
+| BACKUP STATUS 
+✓ Velero backup installed
+Scheduled Backups: 3
+Manual/Non-Scheduled Backups: 4
+
+| RESOURCE QUOTAS & LIMIT RANGES 
+ResourceQuotas: 2 | LimitRanges: 2
+  audiobookshelf   workload-quota   map[limits.cpu:0 limits.memory:0 persistentvolumeclaims:3 pods:0 requests.cpu:0 requests.memory:0]          map[limits.cpu:4 limits.memory:6Gi persistentvolumeclaims:10 pods:20 requests.cpu:2 requests.memory:3Gi]
+  dev              workload-quota   map[limits.cpu:0 limits.memory:0 persistentvolumeclaims:1 pods:1 requests.cpu:100m requests.memory:256Mi]   map[limits.cpu:4 limits.memory:6Gi persistentvolumeclaims:10 pods:20 requests.cpu:2 requests.memory:3Gi]
+
+Pods without resource requests or limits:
+✓ All pods have resource configuration
+
+| POD STABILITY (Restarts > 5) 
+⚠ 39 containers with > 5 restarts:
+  cert-manager/cert-manager-6cf8b7cf47-2cfcp (cert-manager-controller: 36 restarts)
+  cert-manager/cert-manager-cainjector-6ffc5b65d9-kj2kt (cert-manager-cainjector: 125 restarts)
+  cert-manager/cert-manager-webhook-77699c794b-r5vxc (cert-manager-webhook: 28 restarts)
+  dev/forgejo-6f554f4886-mc9wt (forgejo: 86 restarts)
+  kube-system/coredns-54996dc9b4-fxjtw (coredns: 50 restarts)
+  kube-system/local-path-provisioner-58d557dc48-j565k (local-path-provisioner: 103 restarts)
+  kube-system/metrics-server-6dc596dfb8-hwzxn (metrics-server: 40 restarts)
+  kube-system/svclb-traefik-8d4930a1-78w5z (lb-tcp-443: 69 restarts)
+  kube-system/svclb-traefik-8d4930a1-78w5z (lb-tcp-80: 69 restarts)
+  kube-system/svclb-traefik-8d4930a1-pslts (lb-tcp-443: 61 restarts)
+  kube-system/svclb-traefik-8d4930a1-pslts (lb-tcp-80: 61 restarts)
+  kube-system/svclb-traefik-8d4930a1-x2zg5 (lb-tcp-443: 100 restarts)
+  kube-system/svclb-traefik-8d4930a1-x2zg5 (lb-tcp-80: 100 restarts)
+  kube-system/svclb-traefik-8d4930a1-zz5ll (lb-tcp-443: 118 restarts)
+  kube-system/svclb-traefik-8d4930a1-zz5ll (lb-tcp-80: 118 restarts)
+  kube-system/traefik-59b7647586-6zqmb (traefik: 50 restarts)
+  longhorn-system/longhorn-manager-7q99v (longhorn-manager: 1865 restarts)
+  longhorn-system/longhorn-manager-7q99v (pre-pull-share-manager-image: 18 restarts)
+  longhorn-system/longhorn-manager-rfg6h (longhorn-manager: 869 restarts)
+  longhorn-system/longhorn-manager-rfg6h (pre-pull-share-manager-image: 12 restarts)
+  longhorn-system/longhorn-manager-vrgjj (longhorn-manager: 864 restarts)
+  longhorn-system/longhorn-manager-vrgjj (pre-pull-share-manager-image: 12 restarts)
+  longhorn-system/longhorn-manager-wkmsg (longhorn-manager: 1906 restarts)
+  longhorn-system/longhorn-manager-wkmsg (pre-pull-share-manager-image: 17 restarts)
+  monitoring/alertmanager-monitoring-kube-prometheus-alertmanager-0 (alertmanager: 102 restarts)
+  monitoring/alertmanager-monitoring-kube-prometheus-alertmanager-0 (config-reloader: 102 restarts)
+  monitoring/monitoring-grafana-75db59d755-cgckx (grafana: 26 restarts)
+  monitoring/monitoring-grafana-75db59d755-cgckx (grafana-sc-dashboard: 24 restarts)
+  monitoring/monitoring-grafana-75db59d755-cgckx (grafana-sc-datasources: 24 restarts)
+  monitoring/monitoring-kube-prometheus-operator-6bd966b46-psbjh (kube-prometheus-stack: 38 restarts)
+  monitoring/monitoring-kube-state-metrics-5794d648d-th8f4 (kube-state-metrics: 200 restarts)
+  monitoring/monitoring-prometheus-node-exporter-4jh4l (node-exporter: 436 restarts)
+  monitoring/monitoring-prometheus-node-exporter-jc646 (node-exporter: 272 restarts)
+  monitoring/monitoring-prometheus-node-exporter-qvdw2 (node-exporter: 247 restarts)
+  monitoring/monitoring-prometheus-node-exporter-xxxw5 (node-exporter: 258 restarts)
+  monitoring/prometheus-monitoring-kube-prometheus-prometheus-0 (config-reloader: 102 restarts)
+  monitoring/prometheus-monitoring-kube-prometheus-prometheus-0 (prometheus: 102 restarts)
+  nfs-storage/nfs-provisioner-nfs-subdir-external-provisioner-6b767dfb484495k (nfs-subdir-external-provisioner: 41 restarts)
+  velero/velero-7c9bf6f754-bkdq9 (velero: 19 restarts)
+
+| PROBLEM PODS (Pending/Failed/Error) 
+⚠ Pods not Running/Completed:
+  longhorn-system/longhorn-manager-7q99v [CrashLoopBackOff]
+  longhorn-system/longhorn-manager-rfg6h [CrashLoopBackOff]
+  longhorn-system/longhorn-manager-vrgjj [CrashLoopBackOff]
+  longhorn-system/longhorn-manager-wkmsg [CrashLoopBackOff]
+
+| POD SECURITY 
+⚠ 4 Privileged containers found:
+  longhorn-system/longhorn-manager-7q99v
+  longhorn-system/longhorn-manager-rfg6h
+  longhorn-system/longhorn-manager-vrgjj
+  longhorn-system/longhorn-manager-wkmsg
+⚠ Pods with host namespace access:
+  monitoring/monitoring-prometheus-node-exporter-4jh4l (hostNetwork:true/hostPID:true/hostIPC:false)
+  monitoring/monitoring-prometheus-node-exporter-jc646 (hostNetwork:true/hostPID:true/hostIPC:false)
+  monitoring/monitoring-prometheus-node-exporter-qvdw2 (hostNetwork:true/hostPID:true/hostIPC:false)
+  monitoring/monitoring-prometheus-node-exporter-xxxw5 (hostNetwork:true/hostPID:true/hostIPC:false)
+⚠ Sample: Pods that may be running as root (runAsNonRoot not set, max 5):
+  cert-manager/cert-manager-6cf8b7cf47-2cfcp
+  cert-manager/cert-manager-cainjector-6ffc5b65d9-kj2kt
+  cert-manager/cert-manager-webhook-77699c794b-r5vxc
+  dev/forgejo-6f554f4886-mc9wt
+  kube-system/coredns-54996dc9b4-fxjtw
+
+| NETWORK POLICIES 
+6 NetworkPolicies across 11 Namespaces
+⚠ Namespaces without NetworkPolicy:
+  audiobookshelf
+  cert-manager
+  dev
+  kube-node-lease
+  kube-public
+  monitoring
+  nfs-storage
+  velero
+
+| RBAC CONFIGURATION 
+⚠ Service accounts with cluster-admin access:
+  system:masters
+  helm-traefik
+  helm-traefik-crd
+  longhorn-support-bundle
+  velero
+ServiceAccounts with explicit automount=true: 10
+  cert-manager/cert-manager
+  cert-manager/cert-manager-cainjector
+  cert-manager/cert-manager-webhook
+  kube-system/helm-traefik
+  kube-system/helm-traefik-crd
+  monitoring/monitoring-grafana
+  monitoring/monitoring-kube-prometheus-alertmanager
+  monitoring/monitoring-kube-prometheus-operator
+  monitoring/monitoring-kube-prometheus-prometheus
+  monitoring/monitoring-kube-state-metrics
+
+| POD DISRUPTION BUDGETS (Availability) 
+No PodDisruptionBudgets configured
+
+| AUTOSCALING (HPA/VPA) 
+HPAs active: 0
+
+| OBSERVABILITY STACK 
+⚠ No central logging stack found
+Monitoring: Prometheus in monitoring
+Dashboards: Grafana (1 Pods)
+Alerting: AlertManager (1 Pods)
+
+| GITOPS / CI/CD INTEGRATION 
+ArgoCD not found
+Flux CD not found
+
+| SECRET SECURITY 
+Total Secrets: 43 | Opaque: 19
+⚠ No ExternalSecrets operator - manual secret management
+
+| SECURITY POLICIES & ADMISSION 
+OPA Gatekeeper not found
+Kyverno not found
+PSA labeled namespaces: 5/11
+
+═══════════════════════════════════════
+  PRODUCTION READINESS SCORE
+═══════════════════════════════════════
+
+Score: 53% (7/13 checks passed)
+
+Breakdown:
+  Nodes Ready: 4/4
+  Critical Pods: 0
+  High Restarts (>5): 39
+  PDBs (>=2): 0
+  HPAs (>=2): 0
+  NetworkPolicies (>=5): 6
+  PSA Labeled: 5/11
+  Resource Quotas: 2
+
+Cluster Production Check completed: 2026-11-16 23:04:24

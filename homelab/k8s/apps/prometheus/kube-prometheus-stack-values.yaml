@@ -1,0 +1,65 @@
+# helm upgrade monitoring kube-prometheus-stack/kube-prometheus-stack \
+#  -n monitoring -f kube-prometheus-stack-values.yaml
+#
+# kubectl delete pod -n monitoring prometheus-monitoring-kube-prometheus-prometheus-0
+#
+# Nach 10 Minuten:
+#curl -s "http://prometheus.local/api/v1/status/tsdb" \
+#  | jq '.data.headStats | {numSeries, chunkCount}'
+#kubectl top pod -n monitoring
+#
+grafana:
+  persistence:
+    accessModes:
+      - ReadWriteOnce
+    enabled: true
+    size: 2Gi
+    storageClassName: nfs-dynamic
+  resources:
+    requests:
+      cpu: 50m
+      memory: 150Mi
+    limits:
+      memory: 1Gi
+
+# --- Component-Toggles: TOP-LEVEL, nicht unter prometheusSpec! ---
+kubeApiServer:
+  enabled: false # ← der große Hebel: 39k+ Histogramm-Serien weg
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeEtcd:
+  enabled: false
+# kubelet und nodeExporter bleiben an (die willst du für Node-Statistiken)
+
+prometheus:
+  prometheusSpec:
+    scrapeInterval: 60s
+    evaluationInterval: 60s
+    retention: 7d
+    retentionSize: 3GB
+    resources:
+      requests:
+        cpu: 200m
+        memory: 500Mi
+      limits:
+        memory: 1Gi
+    additionalScrapeConfigs:
+      - job_name: caddy-watcher
+        static_configs:
+          - targets: ["192.168.178.199:2019"]
+      - job_name: unbound-watcher
+        static_configs:
+          - targets: ["192.168.178.199:9160"]
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+          storageClassName: nfs-dynamic
