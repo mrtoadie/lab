@@ -6,16 +6,16 @@
 #   * cluster-wide data -> kubectl
 #   * host-level data   -> read locally on this node, fetched over SSH elsewhere
 #
-# Also publishes data/badge.json (shields.io endpoint format) showing the
-# live cluster status — embed it in a README with:
+# Also publishes shields.io endpoint badges (embed in a README with):
 #   ![k3s](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/
 #          mrtoadie/mrtoadie.github.io/main/data/badge.json)
+#   ![pods](.../badge-pods.json)   ![telemetry](.../badge-telemetry.json)
 #
 # Requirements: kubectl, jq, curl, base64, ssh, flock, bash >= 4
 #
 # Usage:
 #   ./collect.sh              collect and publish
-#   ./collect.sh --dry-run    collect only, write /tmp/cluster.json, no upload
+#   ./collect.sh --dry-run    collect only, write /tmp/*.json, no upload
 #
 set -euo pipefail
 
@@ -27,10 +27,16 @@ BRANCH="main"
 
 TOKEN_FILE="$HOME/.github_token"
 DATA_FILE="/tmp/cluster.json"
-BADGE_FILE="/tmp/badge.json"
+DATA_DIR="/tmp"                      # all generated JSON lands here
 REMOTE_PATH="data/cluster.json"
-REMOTE_PATH_BADGE="data/badge.json"
 LOCK_FILE="/tmp/collect.lock"
+
+# Badges: local filename -> remote path in the repo
+BADGES=(
+    "badge.json"         "data/badge.json"
+    "badge-pods.json"    "data/badge-pods.json"
+    "badge-telemetry.json" "data/badge-telemetry.json"
+)
 
 # Host-level metrics (disk / temperature / load / uptime) are gathered for
 # these nodes. The node running this script is queried locally, the rest
@@ -254,12 +260,16 @@ collect_cluster_data() {
     log "✓ wrote $DATA_FILE"
 }
 
-# -------------------------------- badge -----------------------------------
+# -------------------------------- badges ----------------------------------
 
-# shields.io endpoint format. "status" is now reliably the Ready condition,
-# so counting "True" values is safe.
-write_badge() {
+# Three shields.io endpoint badges:
+#   badge.json           k3s cluster status   (green/yellow/red)
+#   badge-pods.json      running pods         (blue, orange if pods pending)
+#   badge-telemetry.json freshness of data    (green/red, red if stale)
+write_badges() {
     local total up color msg
+
+    # --- badge 1: node status ---
     total=${#NODES[@]}
     up=$(jq '[.nodes[] | select(.status == "True")] | length' "$DATA_FILE" 2>/dev/null || echo 0)
 
@@ -270,17 +280,52 @@ write_badge() {
     else
         color="red";    msg="cluster down"
     fi
-
     jq -n --arg m "$msg" --arg c "$color" \
-        '{schemaVersion:1, label:"k3s", message:$m, color:$c}' > "$BADGE_FILE"
+        '{schemaVersion:1, label:"k3s", message:$m, color:$c}' > "$DATA_DIR/badge.json"
+    log "✓ badge.json ($msg)"
 
-    log "✓ wrote $BADGE_FILE ($msg)"
+    # --- badge 2: pods ---
+    local running pending
+    running=$(jq -r '.pods.running // 0' "$DATA_FILE" 2>/dev/null || echo 0)
+    pending=$(jq -r  '.pods.pending // 0' "$DATA_FILE" 2>/dev/null || echo 0)
+
+    if [ "$pending" -gt 0 ]; then
+        color="orange"
+        msg="$running running · $pending pending"
+    else
+        color="blue"
+        msg="$running running"
+    fi
+    jq -n --arg m "$msg" --arg c "$color" \
+        '{schemaVersion:1, label:"pods", message:$m, color:$c}' > "$DATA_DIR/badge-pods.json"
+    log "✓ badge-pods.json ($msg)"
+
+    # --- badge 3: telemetry freshness ---
+    # Compares the timestamp inside cluster.json against the current time.
+    # STALE_MINUTES reflects the 5-minute collect interval plus slack;
+    # if the dashboard says "Last telemetry: yesterday", this badge turns red.
+    local STALE_MINUTES=15
+    local age_min ts_now ts_data
+    ts_now=$(date +%s)
+    ts_data=$(jq -r '.timestamp | fromdateiso8601' "$DATA_FILE" 2>/dev/null || echo 0)
+    age_min=$(( (ts_now - ts_data) / 60 ))
+
+    if [ "$ts_data" -gt 0 ] && [ "$age_min" -le "$STALE_MINUTES" ]; then
+        color="green"
+        msg=$(date -u -d "@$ts_data" +"%H:%M UTC")
+    else
+        color="red"
+        msg="stale (${age_min}m ago)"
+    fi
+    jq -n --arg m "$msg" --arg c "$color" \
+        '{schemaVersion:1, label:"telemetry", message:$m, color:$c}' > "$DATA_DIR/badge-telemetry.json"
+    log "✓ badge-telemetry.json ($msg)"
 }
 
 # ------------------------------ publishing --------------------------------
 
 # Push one local file to one path in the repo. Called once per file, so
-# cluster.json and badge.json share the exact same create/update logic.
+# cluster.json and every badge share the exact same create/update logic.
 push_file() {
     local file="$1" remote="$2" msg="$3"
     local resp http sha content payload
@@ -357,19 +402,23 @@ main() {
     chmod 600 "$TOKEN_FILE" 2>/dev/null || true
 
     collect_cluster_data
-    write_badge
+    write_badges
 
     if [ "$DRY_RUN" -eq 1 ]; then
         log "dry run — skipping upload"
-        echo "--- cluster.json ---"
-        jq '.' "$DATA_FILE"
-        echo "--- badge.json ---"
-        jq '.' "$BADGE_FILE"
+        for f in "$DATA_FILE" "$DATA_DIR"/badge*.json; do
+            echo "--- $(basename "$f") ---"
+            jq '.' "$f"
+        done
     else
-        push_file "$DATA_FILE"  "$REMOTE_PATH"       "metrics: $TIMESTAMP" \
-            || log "(cluster.json upload failed — badge still tried)"
-        push_file "$BADGE_FILE" "$REMOTE_PATH_BADGE" "badge:   $TIMESTAMP" \
-            || log "(badge.json upload failed)"
+        push_file "$DATA_FILE" "$REMOTE_PATH" "metrics: $TIMESTAMP" \
+            || log "(cluster.json upload failed — badges still tried)"
+        local i=0
+        while [ $i -lt ${#BADGES[@]} ]; do
+            push_file "$DATA_DIR/${BADGES[$i]}" "${BADGES[$((i+1))]}" "badge: $TIMESTAMP" \
+                || log "(badge ${BADGES[$i]} upload failed)"
+            i=$((i+2))
+        done
     fi
 
     log "=== done ==="
