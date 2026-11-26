@@ -6,11 +6,16 @@
 #   * cluster-wide data -> kubectl
 #   * host-level data   -> read locally on this node, fetched over SSH elsewhere
 #
-# Requirements: kubectl, jq, curl, base64, ssh, bash >= 4
+# Also publishes shields.io endpoint badges (embed in a README with):
+#   ![k3s](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/
+#          mrtoadie/mrtoadie.github.io/main/data/badge.json)
+#   ![pods](.../badge-pods.json)   ![telemetry](.../badge-telemetry.json)
+#
+# Requirements: kubectl, jq, curl, base64, ssh, flock, bash >= 4
 #
 # Usage:
 #   ./collect.sh              collect and publish
-#   ./collect.sh --dry-run    collect only, write /tmp/cluster.json, no upload
+#   ./collect.sh --dry-run    collect only, write /tmp/*.json, no upload
 #
 set -euo pipefail
 
@@ -22,7 +27,16 @@ BRANCH="main"
 
 TOKEN_FILE="$HOME/.github_token"
 DATA_FILE="/tmp/cluster.json"
+DATA_DIR="/tmp"                      # all generated JSON lands here
 REMOTE_PATH="data/cluster.json"
+LOCK_FILE="/tmp/collect.lock"
+
+# Badges: local filename -> remote path in the repo
+BADGES=(
+    "badge.json"         "data/badge.json"
+    "badge-pods.json"    "data/badge-pods.json"
+    "badge-telemetry.json" "data/badge-telemetry.json"
+)
 
 # Host-level metrics (disk / temperature / load / uptime) are gathered for
 # these nodes. The node running this script is queried locally, the rest
@@ -32,6 +46,7 @@ LOCAL_HOST="$(hostname -s)"
 CONTROL_PLANE="winterfell"
 
 SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new)
+KUBECTL_TIMEOUT="--request-timeout=15s"
 
 # One round trip per node, five lines of output:
 #   1. disk usage of / (rootfs) in percent
@@ -49,6 +64,21 @@ DRY_RUN=0
 [ "${1:-}" = "--dry-run" ] && DRY_RUN=1
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"; }
+
+# ------------------------------- preflight --------------------------------
+
+# Fail fast with a clear message if a dependency is missing.
+for bin in kubectl jq curl base64 ssh flock; do
+    command -v "$bin" >/dev/null 2>&1 || { log "✗ missing dependency: $bin"; exit 1; }
+done
+
+# Prevent overlapping runs when a timer fires while the previous run is
+# still in progress (e.g. after a slow SSH round trip).
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+    log "another instance is still running — exiting"
+    exit 0
+fi
 
 # -------------------------------- helpers ---------------------------------
 
@@ -96,34 +126,38 @@ to_millicores() {
 collect_cluster_data() {
     log "Collecting cluster metrics…"
 
-        # ---------------- nodes: name / role / status / version / age ----------------
-    local nodes_json="[" sep="" name status version role creation_ts age_days age
-    while IFS= read -r line; do
-        name=$(awk '{print $1}' <<<"$line")
-        status=$(awk '{print $2}' <<<"$line")
-        version=$(awk '{print $3}' <<<"$line")
-        creation_ts=$(awk '{print $4}' <<<"$line")
-        [ -z "$name" ] && continue
+    # ------------- nodes: name / role / READY status / version / age --------
+    # Built entirely via kubectl -o json + jq instead of hand-concatenated
+    # strings. The status is taken explicitly from the Ready condition —
+    # .status.conditions[-1] is NOT guaranteed to be the Ready condition,
+    # so the old approach could report arbitrary pressure conditions.
+    NODES_JSON=$(kubectl get nodes -o json $KUBECTL_TIMEOUT 2>/dev/null \
+        | jq -c --arg cp "$CONTROL_PLANE" '
+            [.items[] | {
+                name: .metadata.name,
+                role: (if .metadata.name == $cp then "control-plane" else "worker" end),
+                status: ([.status.conditions[] | select(.type == "Ready") | .status] | .[0] // "Unknown"),
+                version: .status.nodeInfo.kubeletVersion,
+                age: (try (((now - (.metadata.creationTimestamp | fromdateiso8601)) / 86400) | floor | "\(.)d")
+                     catch "unknown")
+            }]')
+    [ -n "$NODES_JSON" ] || NODES_JSON="[]"
 
-        if [ "$name" = "$CONTROL_PLANE" ]; then role="control-plane"; else role="worker"; fi
+    # ------------- one single pods call: totals + running pods per node -----
+    # Replaces four separate `kubectl get pods -A` invocations.
+    PODS_JSON=$(kubectl get pods -A -o json $KUBECTL_TIMEOUT 2>/dev/null | jq -c '
+        {
+            total:   length,
+            running: [.items[] | select(.status.phase == "Running")] | length,
+            pending: [.items[] | select(.status.phase == "Pending")] | length,
+            by_node: ([.items[]
+                       | select(.status.phase == "Running" and .spec.nodeName != null)
+                       | .spec.nodeName]
+                      | group_by(.) | map({(.[0]): length}) | add // {})
+        }')
+    [ -n "$PODS_JSON" ] || PODS_JSON='{"total":0,"running":0,"pending":0,"by_node":{}}'
 
-        # creationTimestamp ist ISO 8601 (z.B. 2025-06-30T08:14:11Z)
-        # -> Alter in ganzen Tagen wie bei "kubectl get nodes" (125d)
-        if [ -n "$creation_ts" ] && date -d "$creation_ts" +%s >/dev/null 2>&1; then
-            age_days=$(( ($(date +%s) - $(date -d "$creation_ts" +%s)) / 86400 ))
-            age="${age_days}d"
-        else
-            age="null"
-        fi
-
-        nodes_json+="${sep}{\"name\":\"${name}\",\"role\":\"${role}\",\"status\":\"${status}\",\"version\":\"${version}\",\"age\":\"${age}\"}"
-        sep=","
-    done < <(kubectl get nodes \
-                -o custom-columns=NAME:.metadata.name,STATUS:.status.conditions[-1].status,VERSION:.status.nodeInfo.kubeletVersion,CREATED:.metadata.creationTimestamp \
-                --no-headers 2>/dev/null || true)
-    nodes_json+="]"
-
-    # ---------------- kubectl top: cpu / memory per node ----------------
+    # ------------- kubectl top: cpu / memory per node -----------------------
     declare -A K_CPU_PCT K_CPU_CORES K_MEM_PCT K_MEM_RAW
 
     while read -r n f_cpu f_cpupct f_mem f_mempct; do
@@ -132,29 +166,19 @@ collect_cluster_data() {
         K_CPU_PCT["$n"]="${f_cpupct%\%}"
         K_MEM_RAW["$n"]="$f_mem"
         K_MEM_PCT["$n"]="${f_mempct%\%}"
-    done < <(kubectl top nodes --no-headers 2>/dev/null || true)
+    done < <(kubectl top nodes --no-headers $KUBECTL_TIMEOUT 2>/dev/null || true)
 
-    # ---------------- running pods per node ----------------
-    declare -A K_PODS
-    while read -r count node; do
-        [ -z "${node:-}" ] && continue
-        K_PODS["$node"]="$count"
-    done < <(kubectl get pods -A \
-                --field-selector=status.phase=Running \
-                -o custom-columns=NODE:.spec.nodeName \
-                --no-headers 2>/dev/null \
-             | awk 'NF { c[$1]++ } END { for (n in c) print c[n], n }')
-
-    # ---------------- per-node resource usage ----------------
+    # ------------- per-node resource usage ----------------------------------
     # CMD_HOSTSTATS returns five lines per host:
     #   stats[0] rootfs %, stats[1] usb %, stats[2] temp,
     #   stats[3] load, stats[4] uptime
-    # disk_percent keeps its old meaning (rootfs, feeds the node gauge);
-    # disk_usb is new and feeds the USB-SSD card on the dashboard.
-    local usage_json="{" usep=""
+    # Every host object is built with jq and merged into one JSON object —
+    # no string concatenation, so a stray quote can never corrupt the file.
+    USAGE_JSON="{}"
+
     local host stats
     local disk_root disk_usb temp_raw load_raw uptime_raw
-    local temp load uptime mem_mib cpu_m pods_n
+    local temp load uptime mem_mib cpu_m pods_n host_obj
 
     for host in "${NODES[@]}"; do
         mapfile -t stats < <(run_on "$host" "$CMD_HOSTSTATS")
@@ -170,101 +194,192 @@ collect_cluster_data() {
         uptime=$(int_or_null "$uptime_raw")
 
         if is_int "$temp_raw" && [ "$temp_raw" -gt 0 ]; then
-            temp=$(awk "BEGIN {printf \"%.1f\", $temp_raw/1000}")
+            temp=$(jq -n --argjson t "$temp_raw" '$t / 1000')
         else
             temp="null"
         fi
 
         mem_mib=$(to_mib "${K_MEM_RAW[$host]:-}")
         cpu_m=$(to_millicores "${K_CPU_CORES[$host]:-}")
-        pods_n=$(int_or_null "${K_PODS[$host]:-}")
+        pods_n=$(int_or_null "$(jq -r --arg h "$host" '.by_node[$h] // "null"' <<<"$PODS_JSON")")
 
-        usage_json+="${usep}\"${host}\":{"
-        usage_json+="\"cpu_percent\":$(int_or_null "${K_CPU_PCT[$host]:-}"),"
-        usage_json+="\"cpu_millicores\":${cpu_m},"
-        usage_json+="\"mem_percent\":$(int_or_null "${K_MEM_PCT[$host]:-}"),"
-        usage_json+="\"mem_mib\":${mem_mib},"
-        usage_json+="\"disk_percent\":${disk_root},"
-        usage_json+="\"disk_usb\":${disk_usb},"
-        usage_json+="\"temp_c\":${temp},"
-        usage_json+="\"load1\":${load},"
-        usage_json+="\"uptime_s\":${uptime},"
-        usage_json+="\"pods\":${pods_n}"
-        usage_json+="}"
-        usep=","
+        host_obj=$(jq -n \
+            --arg h "$host" \
+            --argjson cpu_pct  "$(int_or_null "${K_CPU_PCT[$host]:-}")" \
+            --argjson cpu_m    "$cpu_m" \
+            --argjson mem_pct  "$(int_or_null "${K_MEM_PCT[$host]:-}")" \
+            --argjson mem_mib  "$mem_mib" \
+            --argjson disk     "$disk_root" \
+            --argjson disk_usb "$disk_usb" \
+            --argjson temp     "$temp" \
+            --argjson load     "$load" \
+            --argjson uptime   "$uptime" \
+            --argjson pods     "$pods_n" \
+            '{($h): {
+                cpu_percent:   $cpu_pct,
+                cpu_millicores: $cpu_m,
+                mem_percent:   $mem_pct,
+                mem_mib:       $mem_mib,
+                disk_percent:  $disk,
+                disk_usb:      $disk_usb,
+                temp_c:        $temp,
+                load1:         $load,
+                uptime_s:      $uptime,
+                pods:          $pods
+            }}')
+        USAGE_JSON=$(jq -c --argjson o "$host_obj" '. + $o' <<<"$USAGE_JSON")
     done
-    usage_json+="}"
 
-    # ---------------- cluster-wide counters ----------------
-    local pods_total pods_running pods_pending ns_count deploy_count svc_count
+    # ------------- remaining cluster-wide counters ---------------------------
+    NS_COUNT=$(kubectl get namespaces -o name $KUBECTL_TIMEOUT 2>/dev/null | wc -l | tr -d ' ')
+    DEPLOY_COUNT=$(kubectl get deployments -A -o name $KUBECTL_TIMEOUT 2>/dev/null | wc -l | tr -d ' ')
+    SVC_COUNT=$(kubectl get services -A -o name $KUBECTL_TIMEOUT 2>/dev/null | wc -l | tr -d ' ')
 
-    pods_total=$(kubectl get pods -A --no-headers 2>/dev/null | wc -l | tr -d ' ')
-    pods_running=$(kubectl get pods -A --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l | tr -d ' ')
-    pods_pending=$(kubectl get pods -A --field-selector=status.phase=Pending --no-headers 2>/dev/null | wc -l | tr -d ' ')
-    ns_count=$(kubectl get namespaces --no-headers 2>/dev/null | wc -l | tr -d ' ')
-    deploy_count=$(kubectl get deployments -A --no-headers 2>/dev/null | wc -l | tr -d ' ')
-    svc_count=$(kubectl get services -A --no-headers 2>/dev/null | wc -l | tr -d ' ')
-
-    # ---------------- write the payload ----------------
-    cat > "$DATA_FILE" <<EOF
-{
-  "timestamp": "$TIMESTAMP",
-  "collected_on": "$LOCAL_HOST",
-  "nodes": $nodes_json,
-  "resource_usage": $usage_json,
-  "pods": {
-    "total": ${pods_total:-0},
-    "running": ${pods_running:-0},
-    "pending": ${pods_pending:-0}
-  },
-  "namespaces": ${ns_count:-0},
-  "deployments": ${deploy_count:-0},
-  "services": ${svc_count:-0},
-  "source": "winterfell-k3s-cluster"
-}
-EOF
+    # ------------- write the payload (schema unchanged for the dashboard) ----
+    jq -n \
+        --arg ts "$TIMESTAMP" \
+        --arg col "$LOCAL_HOST" \
+        --argjson nodes "$NODES_JSON" \
+        --argjson usage "$USAGE_JSON" \
+        --argjson pods "$PODS_JSON" \
+        --argjson ns  "${NS_COUNT:-0}" \
+        --argjson dep "${DEPLOY_COUNT:-0}" \
+        --argjson svc "${SVC_COUNT:-0}" \
+        '{
+            timestamp:    $ts,
+            collected_on: $col,
+            nodes:        $nodes,
+            resource_usage: $usage,
+            pods: { total: $pods.total, running: $pods.running, pending: $pods.pending },
+            namespaces:  $ns,
+            deployments: $dep,
+            services:    $svc,
+            source: "winterfell-k3s-cluster"
+        }' > "$DATA_FILE"
 
     log "✓ wrote $DATA_FILE"
 }
 
-# -------------------------------- publishing ------------------------------
+# -------------------------------- badges ----------------------------------
 
-push_to_github() {
-    log "Publishing to GitHub…"
+# Three shields.io endpoint badges:
+#   badge.json           k3s cluster status   (green/yellow/red)
+#   badge-pods.json      running pods         (blue, orange if pods pending)
+#   badge-telemetry.json freshness of data    (green/red, red if stale)
+write_badges() {
+    local total up color msg
 
-    if ! jq -e . "$DATA_FILE" >/dev/null 2>&1; then
-        log "✗ $DATA_FILE is not valid JSON — upload aborted"
+    # --- badge 1: node status ---
+    total=${#NODES[@]}
+    up=$(jq '[.nodes[] | select(.status == "True")] | length' "$DATA_FILE" 2>/dev/null || echo 0)
+
+    if   [ "$total" -gt 0 ] && [ "$up" -eq "$total" ]; then
+        color="green";  msg="$up/$total nodes online"
+    elif [ "$up" -gt 0 ]; then
+        color="yellow"; msg="$up/$total nodes online"
+    else
+        color="red";    msg="cluster down"
+    fi
+    jq -n --arg m "$msg" --arg c "$color" \
+        '{schemaVersion:1, label:"k3s", message:$m, color:$c}' > "$DATA_DIR/badge.json"
+    log "✓ badge.json ($msg)"
+
+    # --- badge 2: pods ---
+    local running pending
+    running=$(jq -r '.pods.running // 0' "$DATA_FILE" 2>/dev/null || echo 0)
+    pending=$(jq -r  '.pods.pending // 0' "$DATA_FILE" 2>/dev/null || echo 0)
+
+    if [ "$pending" -gt 0 ]; then
+        color="orange"
+        msg="$running running · $pending pending"
+    else
+        color="blue"
+        msg="$running running"
+    fi
+    jq -n --arg m "$msg" --arg c "$color" \
+        '{schemaVersion:1, label:"pods", message:$m, color:$c}' > "$DATA_DIR/badge-pods.json"
+    log "✓ badge-pods.json ($msg)"
+
+    # --- badge 3: telemetry freshness ---
+    # Compares the timestamp inside cluster.json against the current time.
+    # STALE_MINUTES reflects the 5-minute collect interval plus slack;
+    # if the dashboard says "Last telemetry: yesterday", this badge turns red.
+    local STALE_MINUTES=15
+    local age_min ts_now ts_data
+    ts_now=$(date +%s)
+    ts_data=$(jq -r '.timestamp | fromdateiso8601' "$DATA_FILE" 2>/dev/null || echo 0)
+    age_min=$(( (ts_now - ts_data) / 60 ))
+
+    if [ "$ts_data" -gt 0 ] && [ "$age_min" -le "$STALE_MINUTES" ]; then
+        color="green"
+        msg=$(date -u -d "@$ts_data" +"%H:%M UTC")
+    else
+        color="red"
+        msg="stale (${age_min}m ago)"
+    fi
+    jq -n --arg m "$msg" --arg c "$color" \
+        '{schemaVersion:1, label:"telemetry", message:$m, color:$c}' > "$DATA_DIR/badge-telemetry.json"
+    log "✓ badge-telemetry.json ($msg)"
+}
+
+# ------------------------------ publishing --------------------------------
+
+# Push one local file to one path in the repo. Called once per file, so
+# cluster.json and every badge share the exact same create/update logic.
+push_file() {
+    local file="$1" remote="$2" msg="$3"
+    local resp http sha content payload
+
+    if ! jq -e . "$file" >/dev/null 2>&1; then
+        log "✗ $file is not valid JSON — upload aborted"
         return 1
     fi
 
-    local content sha payload
-    content=$(base64 -w0 "$DATA_FILE")
+    resp=$(mktemp)
 
-    sha=$(curl -sf -H "Authorization: Bearer $TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$GITHUB_USER/$REPO/contents/$REMOTE_PATH" \
-           | jq -r '.sha // empty' || true)
-
-    if [ -z "$sha" ]; then
-        log "  file does not exist yet — creating"
-        payload=$(jq -n --arg m "metrics: $TIMESTAMP" --arg c "$content" --arg b "$BRANCH" \
-                    '{message:$m, content:$c, branch:$b}')
-    else
-        log "  updating existing file (sha ${sha:0:8})"
-        payload=$(jq -n --arg m "metrics: $TIMESTAMP" --arg c "$content" --arg s "$sha" --arg b "$BRANCH" \
-                    '{message:$m, content:$c, sha:$s, branch:$b}')
-    fi
-
-    if curl -sf -X PUT \
+    # Get current sha. Only 404 means "file not there yet"; any other error
+    # (rate limit, bad token, network) aborts loudly instead of silently
+    # falling into the create path.
+    http=$(curl -s -o "$resp" -w '%{http_code}' \
         -H "Authorization: Bearer $TOKEN" \
         -H "Accept: application/vnd.github+json" \
-        "https://api.github.com/repos/$GITHUB_USER/$REPO/contents/$REMOTE_PATH" \
-        -d "$payload" | jq -r '"✓ committed " + (.commit.sha[0:8] // "?")'; then
-        log "✓ published"
+        "https://api.github.com/repos/$GITHUB_USER/$REPO/contents/$remote")
+
+    if [ "$http" = "200" ]; then
+        sha=$(jq -r '.sha // empty' "$resp")
+    elif [ "$http" = "404" ]; then
+        log "  $remote does not exist yet — will create"
+        sha=""
     else
-        log "✗ upload failed — check token permissions and rate limit"
+        log "✗ GET $remote failed (HTTP $http): $(jq -r '.message // "?"' "$resp" 2>/dev/null)"
+        rm -f "$resp"
         return 1
     fi
+
+    content=$(base64 -w0 "$file")
+    if [ -n "$sha" ]; then
+        payload=$(jq -n --arg m "$msg" --arg c "$content" --arg s "$sha" --arg b "$BRANCH" \
+                    '{message:$m, content:$c, sha:$s, branch:$b}')
+    else
+        payload=$(jq -n --arg m "$msg" --arg c "$content" --arg b "$BRANCH" \
+                    '{message:$m, content:$c, branch:$b}')
+    fi
+
+    http=$(curl -s -o "$resp" -w '%{http_code}' -X PUT \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Accept: application/vnd.github+json" \
+        "https://api.github.com/repos/$GITHUB_USER/$REPO/contents/$remote" \
+        -d "$payload")
+
+    if [ "$http" = "200" ] || [ "$http" = "201" ]; then
+        log "✓ committed $(jq -r '.commit.sha[0:8] // "?"' "$resp") -> $remote"
+    else
+        log "✗ PUT $remote failed (HTTP $http): $(jq -r '.message // "?"' "$resp" 2>/dev/null)"
+        rm -f "$resp"
+        return 1
+    fi
+
+    rm -f "$resp"
 }
 
 # ---------------------------------- main ----------------------------------
@@ -274,15 +389,36 @@ main() {
         log "✗ token file not readable: $TOKEN_FILE"
         exit 1
     fi
-    TOKEN=$(<"$TOKEN_FILE")
+    # Strip whitespace/newlines so a stray blank line in the token file
+    # cannot silently corrupt the Authorization header.
+    TOKEN=$(tr -d ' \t\r\n' < "$TOKEN_FILE")
+    if [ -z "$TOKEN" ]; then
+        log "✗ token file is empty: $TOKEN_FILE"
+        exit 1
+    fi
+    if ! [[ "$TOKEN" =~ ^(gh[pousr]_|github_pat_|[a-f0-9]{40}) ]]; then
+        log "  note: token format looks unusual — proceeding anyway"
+    fi
+    chmod 600 "$TOKEN_FILE" 2>/dev/null || true
 
     collect_cluster_data
+    write_badges
 
     if [ "$DRY_RUN" -eq 1 ]; then
         log "dry run — skipping upload"
-        jq '.' "$DATA_FILE"
+        for f in "$DATA_FILE" "$DATA_DIR"/badge*.json; do
+            echo "--- $(basename "$f") ---"
+            jq '.' "$f"
+        done
     else
-        push_to_github
+        push_file "$DATA_FILE" "$REMOTE_PATH" "metrics: $TIMESTAMP" \
+            || log "(cluster.json upload failed — badges still tried)"
+        local i=0
+        while [ $i -lt ${#BADGES[@]} ]; do
+            push_file "$DATA_DIR/${BADGES[$i]}" "${BADGES[$((i+1))]}" "badge: $TIMESTAMP" \
+                || log "(badge ${BADGES[$i]} upload failed)"
+            i=$((i+2))
+        done
     fi
 
     log "=== done ==="
